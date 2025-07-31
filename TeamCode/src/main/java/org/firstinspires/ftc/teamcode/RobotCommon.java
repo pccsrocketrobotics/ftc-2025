@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,6 +25,8 @@ public class RobotCommon {
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void run() {
@@ -46,18 +49,17 @@ public class RobotCommon {
         backLeft.setVelocity(backLeftTarget);
         frontRight.setVelocity(frontRightTarget);
         backRight.setVelocity(backRightTarget);
-
     }
 
     public void sendTelemetry(Telemetry telemetry) {
         telemetry.addData( "vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
+        telemetry.addData("frontLeftTarget", frontLeftTarget);
+        telemetry.addData("backLeftTarget", backLeftTarget);
+        telemetry.addData("frontRightTarget", frontRightTarget);
+        telemetry.addData("backRightTarget", backRightTarget);
         telemetry.update();
-
-
-
-
     }
 
 }
