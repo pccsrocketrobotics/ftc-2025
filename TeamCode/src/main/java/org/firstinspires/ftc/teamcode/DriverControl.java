@@ -6,9 +6,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
+    public static double ROBOT_SPEED = 2000;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
         initialize();
 
         waitForStart();
@@ -28,9 +29,9 @@ public class DriverControl extends LinearOpMode {
     }
 
     private void controls() {
-        double vx = square(-gamepad1.left_stick_y);
-        double vy = square(gamepad1.right_stick_x);
-        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger);
+        double vx = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
+        double vy = square(gamepad1.right_stick_x) * ROBOT_SPEED;
+        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * ROBOT_SPEED;
 
         common.setRobotSpeed(vx, vy, rot);
 
