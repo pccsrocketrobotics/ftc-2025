@@ -7,9 +7,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 @TeleOp
-public class DriverControl extends LinearOpMode {
+public class WarpDrive extends LinearOpMode {
     private RobotCommon common;
-    public static double ROBOT_SPEED = 1500;
+    public static double ROBOT_SPEED = 1250;
+    public static double WARP_SPEED = 5000;
 
     @Override
     public void runOpMode() {
@@ -34,8 +35,9 @@ public class DriverControl extends LinearOpMode {
     }
 
     private void controls() {
-        double x = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
-        double y = square(gamepad1.left_stick_x) * ROBOT_SPEED;
+        double speed = gamepad1.a ? WARP_SPEED : ROBOT_SPEED;
+        double x = square(-gamepad1.left_stick_y) * speed;
+        double y = square(gamepad1.left_stick_x) * speed;
         double heading = common.odo.getHeading();
         double vx = x * Math.cos(heading) - y * Math.sin(heading);
         double vy = x * Math.sin(heading) + y * Math.cos(heading);
