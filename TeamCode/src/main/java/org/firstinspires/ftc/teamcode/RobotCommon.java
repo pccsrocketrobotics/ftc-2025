@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.pedropathing.localization.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class RobotCommon {
 
+    public static int MAXWHEELSPEED = 5500;
     private double vx;
     private double vy;
     private double rot;
@@ -19,6 +21,7 @@ public class RobotCommon {
     private DcMotorEx frontRight;
     private DcMotorEx backLeft;
     private DcMotorEx backRight;
+    public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
@@ -45,6 +48,15 @@ public class RobotCommon {
         frontRightTarget = (vx - vy) - rot;
         backRightTarget = (vx + vy) - rot;
 
+        double fastest = Math.max(Math.max(Math.abs(frontLeftTarget), Math.abs(frontRightTarget)),Math.max(Math.abs(backLeftTarget), Math.abs(backRightTarget)));
+        if (fastest > MAXWHEELSPEED) {
+           double scaleFactor = fastest / MAXWHEELSPEED;
+           frontLeftTarget = frontLeftTarget/scaleFactor;
+           frontRightTarget = frontRightTarget/scaleFactor;
+           backLeftTarget = backLeftTarget/scaleFactor;
+           backRightTarget = backRightTarget/scaleFactor;
+        }
+
         frontLeft.setVelocity(frontLeftTarget);
         backLeft.setVelocity(backLeftTarget);
         frontRight.setVelocity(frontRightTarget);
@@ -52,13 +64,14 @@ public class RobotCommon {
     }
 
     public void sendTelemetry(Telemetry telemetry) {
+        telemetry.addData("Heading", Math.toDegrees(odo.getHeading()));
         telemetry.addData( "vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
-        telemetry.addData("frontLeftTarget", frontLeftTarget);
-        telemetry.addData("backLeftTarget", backLeftTarget);
-        telemetry.addData("frontRightTarget", frontRightTarget);
-        telemetry.addData("backRightTarget", backRightTarget);
+        telemetry.addData("frontLeft", String.format("%d / %d", (int) frontLeft.getVelocity(), (int) frontLeftTarget));
+        telemetry.addData("backLeft", String.format("%d / %d", (int) frontRight.getVelocity(), (int) frontRightTarget));
+        telemetry.addData("frontRight", String.format("%d / %d", (int) backLeft.getVelocity(), (int) backLeftTarget));
+        telemetry.addData("backRight", String.format("%d / %d", (int) backRight.getVelocity(), (int) backRightTarget));
         telemetry.update();
     }
 
