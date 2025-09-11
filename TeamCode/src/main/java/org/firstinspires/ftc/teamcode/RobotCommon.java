@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.pedropathing.localization.GoBildaPinpointDriver;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class RobotCommon {
 
@@ -64,7 +65,7 @@ public class RobotCommon {
     }
 
     public void sendTelemetry(Telemetry telemetry) {
-        telemetry.addData("Heading", Math.toDegrees(odo.getHeading()));
+        telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData( "vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
