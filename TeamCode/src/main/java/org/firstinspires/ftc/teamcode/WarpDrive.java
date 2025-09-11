@@ -2,9 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.pedropathing.localization.GoBildaPinpointDriver;
+
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class WarpDrive extends LinearOpMode {
@@ -38,7 +41,7 @@ public class WarpDrive extends LinearOpMode {
         double speed = gamepad1.a ? WARP_SPEED : ROBOT_SPEED;
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
-        double heading = common.odo.getHeading();
+        double heading = common.odo.getHeading(AngleUnit.RADIANS);
         double vx = x * Math.cos(heading) - y * Math.sin(heading);
         double vy = x * Math.sin(heading) + y * Math.cos(heading);
         if (gamepad1.guide)  {
