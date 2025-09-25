@@ -25,4 +25,5 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
+    implementation 'com.google.firebase:firebase-crashlytics-buildtools:3.0.6'
 }
