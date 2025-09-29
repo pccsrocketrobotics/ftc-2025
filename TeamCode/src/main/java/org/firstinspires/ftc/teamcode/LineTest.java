@@ -11,6 +11,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -26,6 +27,7 @@ public class LineTest extends OpMode {
     private Telemetry dashTelemetry;
     static TelemetryManager telemetryM;
     public static Follower follower;
+    private ElapsedTime timer;
 
 
     @Override
@@ -36,6 +38,7 @@ public class LineTest extends OpMode {
 
         PanelsConfigurables.INSTANCE.refreshClass(this);
         dashTelemetry = FtcDashboard.getInstance().getTelemetry();
+        timer = new ElapsedTime();
     }
 
     /** This initializes the Follower and creates the forward and backward Paths. */
@@ -50,7 +53,6 @@ public class LineTest extends OpMode {
 
     @Override
     public void start() {
-        follower.activateAllPIDFs();
         forwards = new Path(new BezierLine(new Pose(0,0), new Pose(DISTANCE,0)));
         forwards.setConstantHeadingInterpolation(0);
         backwards = new Path(new BezierLine(new Pose(DISTANCE,0), new Pose(0,0)));
@@ -62,44 +64,62 @@ public class LineTest extends OpMode {
     @Override
     public void loop() {
         follower.update();
+        boolean running = false;
 
         if (!follower.isBusy()) {
-            if (forward) {
-                forward = false;
-                follower.followPath(backwards);
-            } else {
-                forward = true;
-                follower.followPath(forwards);
+            if (timer.seconds() >= 1) {
+                if (forward) {
+                    forward = false;
+                    follower.followPath(backwards);
+                } else {
+                    forward = true;
+                    follower.followPath(forwards);
+                }
             }
+        } else {
+            running = true;
+            timer.reset();
         }
 
-        telemetryM.debug("Running!");
         telemetryM.debug("Driving Forward?: " + forward);
         telemetryM.update(telemetry);
 
+        dashTelemetry.addData("running", running);
         dashTelemetry.addData("forward", forward);
         dashTelemetry.addData("isBusy", follower.isBusy());
-        dashTelemetry.addData("x", follower.poseTracker.getPose().getX());
-        dashTelemetry.addData("y", follower.poseTracker.getPose().getY());
-        dashTelemetry.addData("h", follower.poseTracker.getPose().getHeading());
-        dashTelemetry.addData("currentVelocityM", follower.poseTracker.getVelocity().getMagnitude());
-        dashTelemetry.addData("currentVelocityT", follower.poseTracker.getVelocity().getTheta());
-        dashTelemetry.addData("currentAccelerationM", follower.poseTracker.getAcceleration().getTheta());
-        dashTelemetry.addData("currentAccelerationT", follower.poseTracker.getAcceleration().getTheta());
+        dashTelemetry.addData("atParametricEnd", follower.atParametricEnd());
+        dashTelemetry.addData("distanceTraveledOnPath", follower.getDistanceTraveledOnPath());
+        dashTelemetry.addData("pathCompletion", follower.getPathCompletion());
+        dashTelemetry.addData("distanceRemaining", follower.getDistanceRemaining());
+        dashTelemetry.addData("tValue", follower.getCurrentTValue());
+        dashTelemetry.addData("x", follower.getPose().getX());
+        dashTelemetry.addData("y", follower.getPose().getY());
+        dashTelemetry.addData("h", follower.getPose().getHeading());
+        dashTelemetry.addData("closestX", follower.getClosestPose().getPose().getX());
+        dashTelemetry.addData("closestY", follower.getClosestPose().getPose().getY());
+        dashTelemetry.addData("distanceClosest", follower.getPose().distanceFrom(follower.getClosestPose().getPose()));
 
-        dashTelemetry.addData("translationalErrorM", follower.errorCalculator.getTranslationalError().getMagnitude());
-        dashTelemetry.addData("translationalErrorT", follower.errorCalculator.getTranslationalError().getTheta());
-        dashTelemetry.addData("driveError", follower.errorCalculator.getDriveError());
-        dashTelemetry.addData("headingError", follower.errorCalculator.getHeadingError());
+        dashTelemetry.addData("velocityM", follower.getVelocity().getMagnitude());
+        dashTelemetry.addData("velocityT", follower.getVelocity().getTheta());
+        dashTelemetry.addData("accelerationM", follower.getAcceleration().getTheta());
+        dashTelemetry.addData("accelerationT", follower.getAcceleration().getTheta());
 
-        dashTelemetry.addData("headingVectorM", follower.vectorCalculator.getHeadingVector().getMagnitude());
-        dashTelemetry.addData("headingVectorT", follower.vectorCalculator.getHeadingVector().getTheta());
-        dashTelemetry.addData("translationalVectorM", follower.vectorCalculator.getTranslationalVector().getMagnitude());
-        dashTelemetry.addData("translationalVectorT", follower.vectorCalculator.getTranslationalVector().getTheta());
-        dashTelemetry.addData("centripetalVectorM", follower.vectorCalculator.getCentripetalVector().getMagnitude());
-        dashTelemetry.addData("centripetalVectorT", follower.vectorCalculator.getCentripetalVector().getTheta());
+        dashTelemetry.addData("driveError", follower.getDriveError());
+        dashTelemetry.addData("headingError", follower.getHeadingError());
+        dashTelemetry.addData("translationalErrorM", follower.getTranslationalError().getMagnitude());
+        dashTelemetry.addData("translationalErrorT", follower.getTranslationalError().getTheta());
+
+        dashTelemetry.addData("driveVectorM", follower.getDriveVector().getMagnitude());
+        dashTelemetry.addData("driveVectorT", follower.getDriveVector().getTheta());
+        dashTelemetry.addData("headingVectorM", follower.getHeadingVector().getMagnitude());
+        dashTelemetry.addData("headingVectorT", follower.getHeadingVector().getTheta());
+        dashTelemetry.addData("translationalCorrectionM", follower.getTranslationalCorrection().getMagnitude());
+        dashTelemetry.addData("translationalCorrectionT", follower.getTranslationalCorrection().getTheta());
+        dashTelemetry.addData("centripetalForceCorrectionM", follower.getCentripetalForceCorrection().getMagnitude());
+        dashTelemetry.addData("centripetalForceCorrectionT", follower.getCentripetalForceCorrection().getTheta());
         dashTelemetry.addData("correctiveVectorM", follower.vectorCalculator.getCorrectiveVector().getMagnitude());
         dashTelemetry.addData("correctiveVectorT", follower.vectorCalculator.getCorrectiveVector().getTheta());
+        dashTelemetry.addData("debug", follower.debug());
         dashTelemetry.update();
 
     }
