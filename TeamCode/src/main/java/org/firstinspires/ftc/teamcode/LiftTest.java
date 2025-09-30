@@ -1,10 +1,16 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class LiftTest extends LinearOpMode {
@@ -21,6 +27,7 @@ public class LiftTest extends LinearOpMode {
         lift.setVelocity(LIFT_VELOCITY);
         lift.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         waitForStart();
         if(opModeIsActive()) {
@@ -34,20 +41,16 @@ public class LiftTest extends LinearOpMode {
                     targetPosition = LIFT_MAX;
                 }
 
-
-
-
-
-
-
-
                 lift.setTargetPosition((int) targetPosition);
                 lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 lift.setVelocity(LIFT_VELOCITY);
+                sendTelemetry(telemetry);
             }
         }
-
-
-
+    }
+    public void sendTelemetry(Telemetry telemetry) {
+        telemetry.addData("LiftPosition", lift.getCurrentPosition());
+        telemetry.addData("LiftTargetPosition", lift.getTargetPosition());
+        telemetry.update();
     }
 }
