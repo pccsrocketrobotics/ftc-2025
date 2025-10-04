@@ -7,7 +7,6 @@ import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
 import com.pedropathing.ftc.drivetrains.MecanumConstants;
 import com.pedropathing.ftc.localization.constants.PinpointConstants;
-import com.pedropathing.ftc.localization.constants.TwoWheelConstants;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -24,11 +23,13 @@ public class Constants {
             .lateralZeroPowerAcceleration(-62.1)
             .useSecondaryTranslationalPIDF(false)
             .useSecondaryHeadingPIDF(false)
-            .useSecondaryDrivePIDF(false)
+            .useSecondaryDrivePIDF(true)
+            .drivePIDFSwitch(20)
             .centripetalScaling(0.0005)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.04, 0, 0, 0.015))
             .headingPIDFCoefficients(new PIDFCoefficients(0.5, 0, 0.01, 0.015))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.01, 0, 0.001, 0.6, 0.015));
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.01, 0, 0.001, 0.6, 0.015))
+            .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(0.002, 0, 0.00002, 0.6, 0.01));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .leftFrontMotorName("frontLeft")

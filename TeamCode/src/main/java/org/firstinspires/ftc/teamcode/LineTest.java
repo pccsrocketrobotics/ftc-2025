@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 @TeleOp
 public class LineTest extends OpMode {
     public static double DISTANCE = 40;
+    public static boolean ZERO_DRIVE_AT_PARAMETRIC_END = false;
     private boolean forward = true;
 
     private Path forwards;
@@ -65,6 +66,7 @@ public class LineTest extends OpMode {
     public void loop() {
         follower.update();
         boolean running = false;
+        follower.errorCalculator.zeroDriveAtParametricEnd = ZERO_DRIVE_AT_PARAMETRIC_END;
 
         if (!follower.isBusy()) {
             if (timer.seconds() >= 1) {
@@ -87,6 +89,7 @@ public class LineTest extends OpMode {
         dashTelemetry.addData("running", running);
         dashTelemetry.addData("forward", forward);
         dashTelemetry.addData("isBusy", follower.isBusy());
+        dashTelemetry.addData("isHolding", follower.isHolding());
         dashTelemetry.addData("atParametricEnd", follower.atParametricEnd());
         dashTelemetry.addData("distanceTraveledOnPath", follower.getDistanceTraveledOnPath());
         dashTelemetry.addData("pathCompletion", follower.getPathCompletion());
@@ -98,6 +101,7 @@ public class LineTest extends OpMode {
         dashTelemetry.addData("closestX", follower.getClosestPose().getPose().getX());
         dashTelemetry.addData("closestY", follower.getClosestPose().getPose().getY());
         dashTelemetry.addData("distanceClosest", follower.getPose().distanceFrom(follower.getClosestPose().getPose()));
+//        dashTelemetry.addData("distanceToGoal", follower.errorCalculator.getDistanceToGoal());
 
         dashTelemetry.addData("velocityM", follower.getVelocity().getMagnitude());
         dashTelemetry.addData("velocityT", follower.getVelocity().getTheta());
@@ -119,7 +123,6 @@ public class LineTest extends OpMode {
         dashTelemetry.addData("centripetalForceCorrectionT", follower.getCentripetalForceCorrection().getTheta());
         dashTelemetry.addData("correctiveVectorM", follower.vectorCalculator.getCorrectiveVector().getMagnitude());
         dashTelemetry.addData("correctiveVectorT", follower.vectorCalculator.getCorrectiveVector().getTheta());
-        dashTelemetry.addData("debug", follower.debug());
         dashTelemetry.update();
 
     }
