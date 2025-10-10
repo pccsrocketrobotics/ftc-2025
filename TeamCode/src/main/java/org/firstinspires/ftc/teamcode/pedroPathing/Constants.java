@@ -26,9 +26,9 @@ public class Constants {
             .useSecondaryHeadingPIDF(false)
             .useSecondaryDrivePIDF(false)
             .centripetalScaling(0.0005)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.05, 0, 0.002, 0.015))
-            .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.007, 0, 0, 0.6, 0));
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.007, 0, 0, 0.02))
+            .headingPIDFCoefficients(new PIDFCoefficients(1.4, 0, 0.1, 0.015))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.02, 0, 0, 0.6, 0.015));
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .leftFrontMotorName("frontLeft")

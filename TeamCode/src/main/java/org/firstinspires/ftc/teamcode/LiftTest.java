@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -12,12 +13,14 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@Config
+
 @TeleOp
 public class LiftTest extends LinearOpMode {
     private DcMotorEx lift;
     public static int LIFT_VELOCITY = 5000;
     public static double LIFT_CONTROLS = -100;
-    public static int LIFT_MAX = 4000;
+    public static int LIFT_MAX = 8000;
     private double targetPosition;
     @Override
     public void runOpMode() throws InterruptedException {
@@ -32,6 +35,13 @@ public class LiftTest extends LinearOpMode {
         waitForStart();
         if(opModeIsActive()) {
             while (opModeIsActive()) {
+                if(gamepad1.guideWasPressed()){
+                    lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    lift.setTargetPosition(0);
+                    lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    lift.setVelocity(LIFT_VELOCITY);
+
+                }
                 targetPosition = lift.getTargetPosition() + gamepad1.left_stick_y  * LIFT_CONTROLS;
                 if(targetPosition < 0) {
                     targetPosition = 0;
