@@ -37,6 +37,13 @@ public class DriverControl extends LinearOpMode {
     }
 
     private void controls() {
+        if (gamepad1.a) {
+            common.intakePower = 1;
+        }else if (gamepad1.b) {
+            common.intakePower = -1;
+        }else {
+            common.intakePower = 0;
+        }
         double x = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
         double y = square(gamepad1.left_stick_x) * ROBOT_SPEED;
         double heading = common.odo.getHeading(AngleUnit.RADIANS);

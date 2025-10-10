@@ -11,9 +11,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class RobotCommon {
 
     public static int MAXWHEELSPEED = 5500;
+    private static int INTAKE_SPEED = 1500;
     private double vx;
     private double vy;
     private double rot;
+    public double intakePower;
     private double frontLeftTarget;
     private double backLeftTarget;
     private double frontRightTarget;
@@ -22,6 +24,7 @@ public class RobotCommon {
     private DcMotorEx frontRight;
     private DcMotorEx backLeft;
     private DcMotorEx backRight;
+    private DcMotorEx intake;
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
@@ -62,6 +65,9 @@ public class RobotCommon {
         backLeft.setVelocity(backLeftTarget);
         frontRight.setVelocity(frontRightTarget);
         backRight.setVelocity(backRightTarget);
+    }
+    private void runIntake() {
+        intake.setPower(intakePower);
     }
 
     public void sendTelemetry(Telemetry telemetry) {
