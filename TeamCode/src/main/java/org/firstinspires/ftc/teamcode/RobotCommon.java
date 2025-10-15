@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,6 +13,7 @@ public class RobotCommon {
 
     public static int MAXWHEELSPEED = 5500;
     private static int INTAKE_SPEED = 1500;
+    public static int LIFT_MAX;
     private double vx;
     private double vy;
     private double rot;
@@ -20,11 +22,15 @@ public class RobotCommon {
     private double backLeftTarget;
     private double frontRightTarget;
     private double backRightTarget;
+    private double rightLiftPosition;
+    private double leftLiftPosition;
+    private int liftTargetPosition;
     private DcMotorEx frontLeft;
     private DcMotorEx frontRight;
     private DcMotorEx backLeft;
     private DcMotorEx backRight;
     private DcMotorEx intake;
+    private DcMotorEx lift;
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
@@ -32,12 +38,17 @@ public class RobotCommon {
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        lift = hardwareMap.get(DcMotorEx.class, "lift");
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void run() {
         runDrive();
+        runIntake();
+        runLift();
     }
 
     public void setRobotSpeed(double vx, double vy, double rot) {
@@ -68,6 +79,17 @@ public class RobotCommon {
     }
     private void runIntake() {
         intake.setPower(intakePower);
+    }
+
+    public void setIntakePower(double incomingPower) {
+        intakePower = incomingPower;
+
+    }
+    public void runLift() {
+        lift.setTargetPosition(liftTargetPosition);
+    }
+    public void setLiftTargetPosition(int liftTargetPos) {
+        liftTargetPosition = liftTargetPos;
     }
 
     public void sendTelemetry(Telemetry telemetry) {

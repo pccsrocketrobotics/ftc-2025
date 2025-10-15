@@ -13,6 +13,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
+    public static int LIFT_UP = 0;
+
 
     @Override
     public void runOpMode() {
@@ -38,11 +40,14 @@ public class DriverControl extends LinearOpMode {
 
     private void controls() {
         if (gamepad1.a) {
-            common.intakePower = 1;
+            common.setIntakePower(1);
         }else if (gamepad1.b) {
-            common.intakePower = -1;
+            common.setIntakePower(-1);
         }else {
-            common.intakePower = 0;
+            common.setIntakePower(0);
+        }
+        if (gamepad1.dpad_up){
+            common.setLiftTargetPosition(LIFT_UP);
         }
         double x = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
         double y = square(gamepad1.left_stick_x) * ROBOT_SPEED;
@@ -56,10 +61,9 @@ public class DriverControl extends LinearOpMode {
 
         common.setRobotSpeed(vx, vy, rot);
     }
-
     public static double square(double amount) {
         return amount * Math.abs(amount);
-
     }
+
 }
 
