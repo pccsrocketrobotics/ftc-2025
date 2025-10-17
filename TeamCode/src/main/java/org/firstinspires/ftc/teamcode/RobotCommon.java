@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.ftccommon.configuration.RobotConfigFileManager;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class RobotCommon {
+    public String ROBOT_CONFIG = "";
 
     public static int MAXWHEELSPEED = 5500;
     private double vx;
@@ -25,12 +28,20 @@ public class RobotCommon {
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
+        ROBOT_CONFIG = getRobotConfigName();
+
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontLeft");
         frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         backRight = hardwareMap.get(DcMotorEx.class, "backRight");
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        if (isCompetitionBot()) {
+            frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+            backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        } else {
+            frontRight.setDirection(DcMotor.Direction.REVERSE);
+            backLeft.setDirection(DcMotor.Direction.REVERSE);
+        }
     }
 
     public void run() {
@@ -65,7 +76,11 @@ public class RobotCommon {
     }
 
     public void sendTelemetry(Telemetry telemetry) {
-        telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
+        if (isCompetitionBot()) {
+            telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
+        }
+        telemetry.addData("Config", ROBOT_CONFIG);
+        telemetry.addData("isComp", isCompetitionBot());
         telemetry.addData( "vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
@@ -76,5 +91,17 @@ public class RobotCommon {
         telemetry.update();
     }
 
+    public static String getRobotConfigName() {
+        RobotConfigFileManager hardwareConfigManager = new RobotConfigFileManager();
+        return hardwareConfigManager.getActiveConfig().getName();
+    }
+
+    public boolean isPracticeBot() {
+        return ROBOT_CONFIG.equals("Fang");
+    }
+
+    public boolean isCompetitionBot() {
+        return !isPracticeBot();
+    }
 }
 
