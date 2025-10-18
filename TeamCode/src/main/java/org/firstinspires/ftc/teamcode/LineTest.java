@@ -66,7 +66,7 @@ public class LineTest extends OpMode {
     public void loop() {
         follower.update();
         boolean running = false;
-        follower.errorCalculator.zeroDriveAtParametricEnd = ZERO_DRIVE_AT_PARAMETRIC_END;
+//        follower.errorCalculator.zeroDriveAtParametricEnd = ZERO_DRIVE_AT_PARAMETRIC_END;
 
         if (!follower.isBusy()) {
             if (timer.seconds() >= 1) {
@@ -89,7 +89,7 @@ public class LineTest extends OpMode {
         dashTelemetry.addData("running", running);
         dashTelemetry.addData("forward", forward);
         dashTelemetry.addData("isBusy", follower.isBusy());
-        dashTelemetry.addData("isHolding", follower.isHolding());
+//        dashTelemetry.addData("isHolding", follower.isHolding());
         dashTelemetry.addData("atParametricEnd", follower.atParametricEnd());
         dashTelemetry.addData("distanceTraveledOnPath", follower.getDistanceTraveledOnPath());
         dashTelemetry.addData("pathCompletion", follower.getPathCompletion());
