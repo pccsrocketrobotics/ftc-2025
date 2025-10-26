@@ -14,6 +14,7 @@ public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
     public static int LIFT_UP = 0;
+    private double shooterVelocity = 0;
     
     @Override
     public void runOpMode() {
@@ -47,6 +48,20 @@ public class DriverControl extends LinearOpMode {
         }
         if (gamepad1.dpad_up){
             common.setLiftTargetPosition(LIFT_UP);
+        }
+        if (gamepad2.y) {
+            shooterVelocity = 1000;
+            common.setShooterVelocity(shooterVelocity);
+        }else {
+            shooterVelocity = 0;
+            common.setShooterVelocity(shooterVelocity);
+        }
+        if (gamepad2.left_bumper) {
+            common.setFeederVelocity(RobotCommon.FeederOptions.IN);
+        } else if (gamepad2.right_bumper) {
+            common.setFeederVelocity(RobotCommon.FeederOptions.OUT);
+        } else {
+            common.setFeederVelocity(RobotCommon.FeederOptions.STOP);
         }
         double x = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
         double y = square(gamepad1.left_stick_x) * ROBOT_SPEED;
