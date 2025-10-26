@@ -14,8 +14,7 @@ public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
     public static int LIFT_UP = 0;
-
-
+    
     @Override
     public void runOpMode() {
         initialize();
