@@ -31,19 +31,20 @@ public class TestAuton extends LinearOpMode {
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private RobotCommon common;
+
     @Override
-    public void runOpMode () {
+    public void runOpMode() {
 
         follower.setMaxPower(1.00); //causes code to crash with NullPointerExeption error
         initialize();
 
         waitForStart();
-        if(opModeIsActive()) {
+        if (opModeIsActive()) {
 
             PathChain supplier = follower.pathBuilder()
-                    .addPath(new Path(new BezierLine(follower::getPose, new Pose(20,0))))
-                    .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, .7853, 0.8))
-                    .build();
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(20, 0))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, .7853, 0.8))
+                .build();
 
 
             while (opModeIsActive()) {
@@ -53,15 +54,17 @@ public class TestAuton extends LinearOpMode {
             }
         }
     }
+
     private void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         common = new RobotCommon();
         common.initialize(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose1 == null ? new Pose(0,0) : startingPose1);
+        follower.setStartingPose(startingPose1 == null ? new Pose(0, 0) : startingPose1);
         follower.update();
-        common.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        common.odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
     }
+}
 
 
 

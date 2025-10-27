@@ -60,7 +60,7 @@ public class DriverControl extends LinearOpMode {
         } else if (gamepad2.x) {
             shooterVelocity = SHOOTER_X;
             common.setShooterVelocity(shooterVelocity);
-        } else if (new gamepad2.dpad_down) {
+        } else if (gamepad2.dpad_down) {
             shooterVelocity = -500;
             common.setShooterVelocity(shooterVelocity);
         } else if (gamepad2.guide) {
