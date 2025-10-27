@@ -55,9 +55,18 @@ public class RobotCommon {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
         rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
+
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftFeeder.setDirection(CRServo.Direction.REVERSE);
+
         liftTargetPosition = rightLift.getCurrentPosition();
         runLift();
-        leftFeeder.setDirection(CRServo.Direction.REVERSE);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
@@ -67,7 +76,7 @@ public class RobotCommon {
         runIntake();
         runLift();
         runShooter();
-        runFeeder(feederOption);
+        runFeeder();
     }
 
     public void setRobotSpeed(double vx, double vy, double rot) {
@@ -110,7 +119,7 @@ public class RobotCommon {
         rightLift.setTargetPosition(liftTargetPosition);
         leftLift.setTargetPosition(liftTargetPosition);
     }
-    public void runFeeder(FeederOptions feederOption) {
+    public void runFeeder() {
         if(feederOption == FeederOptions.IN) {
             rightFeeder.setPower(1);
             leftFeeder.setPower(1);
@@ -141,6 +150,8 @@ public class RobotCommon {
         telemetry.addData("vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
+        telemetry.addData("shooterTarget", shooterVelocity);
+        telemetry.addData("shooter", shooter.getVelocity());
         telemetry.addData("frontLeft", String.format("%d / %d", (int) frontLeft.getVelocity(), (int) frontLeftTarget));
         telemetry.addData("backLeft", String.format("%d / %d", (int) frontRight.getVelocity(), (int) frontRightTarget));
         telemetry.addData("frontRight", String.format("%d / %d", (int) backLeft.getVelocity(), (int) backLeftTarget));

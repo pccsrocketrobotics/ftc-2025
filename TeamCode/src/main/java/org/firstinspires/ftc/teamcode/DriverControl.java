@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -10,10 +11,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
+@Config
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
     public static int LIFT_UP = 0;
+    public static double SHOOTER_X = 500;
+    public static double SHOOTER_Y = 1000;
     private double shooterVelocity = 0;
     
     @Override
@@ -39,9 +43,9 @@ public class DriverControl extends LinearOpMode {
     }
 
     private void controls() {
-        if (gamepad1.a) {
+        if (gamepad2.a) {
             common.setIntakePower(1);
-        }else if (gamepad1.b) {
+        }else if (gamepad2.b) {
             common.setIntakePower(-1);
         }else {
             common.setIntakePower(0);
@@ -50,15 +54,18 @@ public class DriverControl extends LinearOpMode {
             common.setLiftTargetPosition(LIFT_UP);
         }
         if (gamepad2.y) {
-            shooterVelocity = 1000;
+            shooterVelocity = SHOOTER_Y;
             common.setShooterVelocity(shooterVelocity);
-        }else {
+        }else if (gamepad2.x) {
+            shooterVelocity = SHOOTER_X;
+            common.setShooterVelocity(shooterVelocity);
+        } else {
             shooterVelocity = 0;
             common.setShooterVelocity(shooterVelocity);
         }
-        if (gamepad2.left_bumper) {
+        if (gamepad2.right_bumper) {
             common.setFeederVelocity(RobotCommon.FeederOptions.IN);
-        } else if (gamepad2.right_bumper) {
+        } else if (gamepad2.left_bumper) {
             common.setFeederVelocity(RobotCommon.FeederOptions.OUT);
         } else {
             common.setFeederVelocity(RobotCommon.FeederOptions.STOP);
