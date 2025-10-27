@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
+    public static double ROBOT_FAST = 3000;
     public static int LIFT_UP = 0;
     public static double SHOOTER_X = 500;
     public static double SHOOTER_Y = 1000;
@@ -45,24 +46,28 @@ public class DriverControl extends LinearOpMode {
     private void controls() {
         if (gamepad2.a) {
             common.setIntakePower(1);
-        }else if (gamepad2.b) {
+        } else if (gamepad2.b) {
             common.setIntakePower(-1);
-        }else {
+        } else {
             common.setIntakePower(0);
         }
-        if (gamepad1.dpad_up){
+        if (gamepad1.dpad_up) {
             common.setLiftTargetPosition(LIFT_UP);
         }
         if (gamepad2.y) {
             shooterVelocity = SHOOTER_Y;
             common.setShooterVelocity(shooterVelocity);
-        }else if (gamepad2.x) {
+        } else if (gamepad2.x) {
             shooterVelocity = SHOOTER_X;
             common.setShooterVelocity(shooterVelocity);
-        } else {
+        } else if (new gamepad2.dpad_down) {
+            shooterVelocity = -500;
+            common.setShooterVelocity(shooterVelocity);
+        } else if (gamepad2.guide) {
             shooterVelocity = 0;
             common.setShooterVelocity(shooterVelocity);
         }
+
         if (gamepad2.right_bumper) {
             common.setFeederVelocity(RobotCommon.FeederOptions.IN);
         } else if (gamepad2.left_bumper) {
@@ -70,8 +75,13 @@ public class DriverControl extends LinearOpMode {
         } else {
             common.setFeederVelocity(RobotCommon.FeederOptions.STOP);
         }
-        double x = square(-gamepad1.left_stick_y) * ROBOT_SPEED;
-        double y = square(gamepad1.left_stick_x) * ROBOT_SPEED;
+        double speed = ROBOT_SPEED;
+        if (gamepad1.a) {
+            speed = ROBOT_FAST;
+        }
+
+        double x = square(-gamepad1.left_stick_y) * speed;
+        double y = square(gamepad1.left_stick_x) * speed;
         double heading = common.odo.getHeading(AngleUnit.RADIANS);
         double vx = x * Math.cos(heading) - y * Math.sin(heading);
         double vy = x * Math.sin(heading) + y * Math.cos(heading);
