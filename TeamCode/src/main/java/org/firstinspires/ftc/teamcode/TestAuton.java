@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
 
+import android.graphics.Point;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
@@ -37,14 +39,25 @@ public class TestAuton extends LinearOpMode {
 
         follower.setMaxPower(1.00); //causes code to crash with NullPointerExeption error
         initialize();
+        Pose wallStartPose = new Pose(0, 0, Math.toRadians(0));
+        Pose gateStartPose = new Pose(198, 10, Math.toRadians(40));
+        Pose wallShootingPose = new Pose(0, 0, Math.toRadians(20));
+        Pose gateShootingPose = new Pose(61, 0, Math.toRadians(45));
+        Pose gateEndPose = new Pose(160, 10, Math.toRadians(90));
+        Pose wallEndPose = new Pose(30, 10, Math.toRadians(90));
+
+        follower.setStartingPose(wallStartPose);
+
+        PathChain wallShooting = follower.pathBuilder()
+                .addPath(new BezierLine(new Pose(wallStartPose.getX(),wallStartPose.getY()), new Pose(wallShootingPose.getX(), wallShootingPose.getY())))
+                .setLinearHeadingInterpolation(wallStartPose.getHeading(),wallShootingPose.getHeading())
+                //.addPath(new BezierLine(new Point(whitePose), new Point(whitePose)))
+                //.setPathEndTimeoutConstraint(0)
+                //STARTED FIRST PATH CALL IT NEXT TIME
+                .build();
 
         waitForStart();
         if (opModeIsActive()) {
-
-            PathChain supplier = follower.pathBuilder()
-                .addPath(new Path(new BezierLine(follower::getPose, new Pose(20, 0))))
-                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, .7853, 0.8))
-                .build();
 
 
             while (opModeIsActive()) {

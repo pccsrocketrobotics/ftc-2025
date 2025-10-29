@@ -29,7 +29,7 @@ public class SimpleAuton extends LinearOpMode {
         if(opModeIsActive()) {
             common.setRobotSpeed(1500, 0, 0);
             common.run();
-            sleep(3000);
+            sleep(1000);
             common.setRobotSpeed(0, 0, 0);
             common.run();
         }
