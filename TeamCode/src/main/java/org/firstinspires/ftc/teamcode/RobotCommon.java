@@ -6,7 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -25,7 +26,7 @@ public class RobotCommon {
     private double frontRightTarget;
     private double backRightTarget;
     private int liftTargetPosition;
-    public double shooterVelocity;
+    public double shooterTarget;
     private double rightFeederVelocity;
     private double leftFeederVelocity;
     private CRServo leftFeeder;
@@ -42,6 +43,11 @@ public class RobotCommon {
     private DcMotorEx intake;
     private DcMotorEx leftLift;
     private DcMotorEx rightLift;
+    private LED redLed;
+    private LED blueLed;
+    private LED yellowLed1;
+    private LED yellowLed2;
+    private ElapsedTime ledTimer = new ElapsedTime();
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
@@ -55,6 +61,10 @@ public class RobotCommon {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
         rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
+        redLed = hardwareMap.get(LED.class, "redLed");
+        blueLed = hardwareMap.get(LED.class, "blueLed");
+        yellowLed1 = hardwareMap.get(LED.class, "yellowLed1");
+        yellowLed2 = hardwareMap.get(LED.class, "yellowLed2");
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -69,6 +79,11 @@ public class RobotCommon {
         runLift();
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        redLed.off();
+        yellowLed1.off();
+        yellowLed2.off();
+        blueLed.off();
     }
 
     public void run() {
@@ -77,6 +92,7 @@ public class RobotCommon {
         runLift();
         runShooter();
         runFeeder();
+        runLeds();
     }
 
     public void setRobotSpeed(double vx, double vy, double rot) {
@@ -105,21 +121,21 @@ public class RobotCommon {
         frontRight.setVelocity(frontRightTarget);
         backRight.setVelocity(backRightTarget);
     }
-
-    public void runIntake() {
+//Runners
+    private void runIntake() {
         intake.setPower(intakePower);
     }
 
-    public void runShooter() {
-        shooter.setVelocity(shooterVelocity);
+    private void runShooter() {
+        shooter.setVelocity(shooterTarget);
 
     }
 
-    public void runLift() {
+    private void runLift() {
         rightLift.setTargetPosition(liftTargetPosition);
         leftLift.setTargetPosition(liftTargetPosition);
     }
-    public void runFeeder() {
+    private void runFeeder() {
         if(feederOption == FeederOptions.IN) {
             rightFeeder.setPower(1);
             leftFeeder.setPower(1);
@@ -131,7 +147,29 @@ public class RobotCommon {
             leftFeeder.setPower(0);
         }
     }
-
+    private void runLeds() {
+        boolean red = false;
+        boolean blue = false;
+        boolean yellow = false;
+        if (shooter.getVelocity() < 100 && shooterTarget == 0) {
+            ledTimer.reset();
+            red = true;
+        } else if (Math.abs(shooter.getVelocity() - shooterTarget) < 50) {
+            if (ledTimer.milliseconds() > 500) {
+                blue = true;
+            } else {
+                yellow = true;
+            }
+        } else {
+            ledTimer.reset();
+            yellow = true;
+        }
+        redLed.enable(red);
+        blueLed.enable(blue);
+        yellowLed1.enable(yellow);
+        yellowLed2.enable(yellow);
+    }
+    //Setters
     public void setLiftTargetPosition(int liftTargetPosition) {
         this.liftTargetPosition = liftTargetPosition;
     }
@@ -139,8 +177,8 @@ public class RobotCommon {
     public void setIntakePower(double intakePower) {
         this.intakePower = intakePower;
     }
-    public void setShooterVelocity(double shooterVelocity) {
-        this.shooterVelocity = shooterVelocity;
+    public void setShooterTarget(double shooterTarget) {
+        this.shooterTarget = shooterTarget;
     }
     public void setFeederVelocity(FeederOptions feederOption) {
         this.feederOption = feederOption;
@@ -150,7 +188,7 @@ public class RobotCommon {
         telemetry.addData("vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
-        telemetry.addData("shooterTarget", shooterVelocity);
+        telemetry.addData("shooterTarget", shooterTarget);
         telemetry.addData("shooter", shooter.getVelocity());
         telemetry.addData("frontLeft", String.format("%d / %d", (int) frontLeft.getVelocity(), (int) frontLeftTarget));
         telemetry.addData("backLeft", String.format("%d / %d", (int) frontRight.getVelocity(), (int) frontRightTarget));
