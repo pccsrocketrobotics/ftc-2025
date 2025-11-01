@@ -16,9 +16,9 @@ public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
     public static double ROBOT_FAST = 3000;
-    public static int LIFT_UP = 0;
-    public static double SHOOTER_X = 500;
-    public static double SHOOTER_Y = 1000;
+    public static int LIFT_UP = 1;
+    public static double SHOOTER_X = 1225;
+    public static double SHOOTER_Y = 1600;
     private double shooterVelocity = 0;
     
     @Override
