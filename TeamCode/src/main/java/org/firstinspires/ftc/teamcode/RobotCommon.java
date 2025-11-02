@@ -203,7 +203,7 @@ public class RobotCommon {
         this.feederOption = feederOption;
     }
     public void sendTelemetry(Telemetry telemetry) {
-        telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
+        //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData("vx", vx);
         telemetry.addData("vy", vy);
         telemetry.addData("rot", rot);
