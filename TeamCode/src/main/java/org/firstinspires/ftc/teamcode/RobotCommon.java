@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.control.PIDFCoefficients;
+import com.pedropathing.control.PIDFController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+@Config
 public class RobotCommon {
 
     public static int MAXWHEELSPEED = 5500;
@@ -29,6 +33,13 @@ public class RobotCommon {
     public double shooterTarget;
     private double rightFeederVelocity;
     private double leftFeederVelocity;
+    public static double SHOOTER_P = 0;
+    public static double SHOOTER_I = 0;
+    public static double SHOOTER_D = 0;
+    public static double SHOOTER_F = 0.00063;
+    private PIDFCoefficients shooterCoefficients = new PIDFCoefficients(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
+    private PIDFController shooterController = new PIDFController(shooterCoefficients);
+    private double shooterPower;
     private CRServo leftFeeder;
     private CRServo rightFeeder;
     public enum FeederOptions {
@@ -127,8 +138,16 @@ public class RobotCommon {
     }
 
     private void runShooter() {
-        shooter.setVelocity(shooterTarget);
-
+        shooterCoefficients.setCoefficients(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
+        shooterController.setTargetPosition(shooterTarget);
+        shooterController.updatePosition(shooter.getVelocity());
+        shooterController.updateFeedForwardInput(shooterTarget);
+        shooterPower = shooterController.run();
+        if (shooterTarget == 0) {
+            shooter.setPower(0);
+        }else {
+            shooter.setPower(shooterPower);
+        }
     }
 
     private void runLift() {
@@ -155,7 +174,7 @@ public class RobotCommon {
             ledTimer.reset();
             red = true;
         } else if (Math.abs(shooter.getVelocity() - shooterTarget) < 50) {
-            if (ledTimer.milliseconds() > 500) {
+            if (ledTimer.milliseconds() > 200) {
                 blue = true;
             } else {
                 yellow = true;
@@ -190,6 +209,7 @@ public class RobotCommon {
         telemetry.addData("rot", rot);
         telemetry.addData("shooterTarget", shooterTarget);
         telemetry.addData("shooter", shooter.getVelocity());
+        telemetry.addData("shooterPower", shooterPower);
         telemetry.addData("frontLeft", String.format("%d / %d", (int) frontLeft.getVelocity(), (int) frontLeftTarget));
         telemetry.addData("backLeft", String.format("%d / %d", (int) frontRight.getVelocity(), (int) frontRightTarget));
         telemetry.addData("frontRight", String.format("%d / %d", (int) backLeft.getVelocity(), (int) backLeftTarget));
