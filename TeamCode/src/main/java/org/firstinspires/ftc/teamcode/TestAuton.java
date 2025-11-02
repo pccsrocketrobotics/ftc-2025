@@ -50,11 +50,31 @@ public class TestAuton extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()) {
-
+            int state = 0;
 
             while (opModeIsActive()) {
+                follower.update();
+                switch (state) {
+                    case 0:
+                        follower.followPath(halfShotPath);
+                        state = 1;
+                        break;
+                    case 1:
+                        if(!follower.isBusy()){
+                            state = 2;
+                        }
+                        break;
+                    case 2:
+                        follower.followPath(ballPickPath);
+                        state = 3;
+                        break;
+                }
+                telemetry.addData("state",state);
+                telemetry.addData("x", follower.getPose().getX());
+                telemetry.addData("y", follower.getPose().getY());
+                telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
+                telemetry.addData("followerBusy", follower.isBusy());
                 common.run();
-                common.odo.update();
                 common.sendTelemetry(telemetry);
             }
         }
@@ -67,12 +87,5 @@ public class TestAuton extends LinearOpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();
-        common.odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
     }
 }
-
-
-
-
-
-
