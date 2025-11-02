@@ -13,7 +13,6 @@ import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class RobotCommon {
@@ -24,7 +23,10 @@ public class RobotCommon {
     private double vx;
     private double vy;
     private double rot;
-    public double intakePower;
+    public enum ShaftDirection {
+        STOP, IN, OUT
+    }
+    public ShaftDirection intakeDirection;
     private double frontLeftTarget;
     private double backLeftTarget;
     private double frontRightTarget;
@@ -42,10 +44,7 @@ public class RobotCommon {
     private double shooterPower;
     private CRServo leftFeeder;
     private CRServo rightFeeder;
-    public enum FeederOptions {
-        STOP, IN, OUT
-    }
-    private FeederOptions feederOption = FeederOptions.STOP;
+    private ShaftDirection feederDirection = ShaftDirection.STOP;
     private DcMotorEx shooter;
     private DcMotorEx frontLeft;
     private DcMotorEx backLeft;
@@ -105,6 +104,13 @@ public class RobotCommon {
         runFeeder();
         runLeds();
     }
+    public void runAuton() {
+        runIntake();
+        runLift();
+        runShooter();
+        runFeeder();
+        runLeds();
+    }
 
     public void setRobotSpeed(double vx, double vy, double rot) {
         this.vx = vx;
@@ -134,7 +140,13 @@ public class RobotCommon {
     }
 //Runners
     private void runIntake() {
-        intake.setPower(intakePower);
+        if(intakeDirection == ShaftDirection.IN) {
+            intake.setPower(1);
+        } else if(intakeDirection == ShaftDirection.OUT) {
+            intake.setPower(-1);
+        } else {
+            intake.setPower(0);
+        }
     }
 
     private void runShooter() {
@@ -155,10 +167,10 @@ public class RobotCommon {
         leftLift.setTargetPosition(liftTargetPosition);
     }
     private void runFeeder() {
-        if(feederOption == FeederOptions.IN) {
+        if(feederDirection == ShaftDirection.IN) {
             rightFeeder.setPower(1);
             leftFeeder.setPower(1);
-        } else if(feederOption == FeederOptions.OUT) {
+        } else if(feederDirection == ShaftDirection.OUT) {
             rightFeeder.setPower(-1);
             leftFeeder.setPower(-1);
         } else {
@@ -193,14 +205,14 @@ public class RobotCommon {
         this.liftTargetPosition = liftTargetPosition;
     }
 
-    public void setIntakePower(double intakePower) {
-        this.intakePower = intakePower;
+    public void setIntakeDirection(ShaftDirection intakeDirection) {
+        this.intakeDirection = intakeDirection;
     }
     public void setShooterTarget(double shooterTarget) {
         this.shooterTarget = shooterTarget;
     }
-    public void setFeederVelocity(FeederOptions feederOption) {
-        this.feederOption = feederOption;
+    public void setFeederDirection(ShaftDirection feederDirection) {
+        this.feederDirection = feederDirection;
     }
     public void sendTelemetry(Telemetry telemetry) {
         //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
@@ -217,6 +229,8 @@ public class RobotCommon {
         telemetry.addData("leftLift", leftLift.getCurrentPosition());
         telemetry.addData("rightLift", rightLift.getCurrentPosition());
         telemetry.addData("liftTargetPosition", liftTargetPosition);
+        telemetry.addData("feeder",feederDirection);
+        telemetry.addData("intake",intakeDirection);
         telemetry.update();
     }
 

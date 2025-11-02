@@ -1,39 +1,32 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
-
-import android.graphics.Point;
-
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.HeadingInterpolator;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.pedroPathing.Tuning;
-
-import java.util.function.Supplier;
 
 @Autonomous
+@Config
 public class TestAuton extends LinearOpMode {
     private Follower follower;
     public static Pose startingPose = new Pose(0,0,Math.toRadians(0));
     public static Pose halfShotPose = new Pose(-30,-27,Math.toRadians(45));
     public static Pose ballPickingPose= new Pose(-45,-12,Math.toRadians(90));
-    private boolean automatedDrive;
-    private Supplier<PathChain> pathChain;
+    public static double SHOOTER_AUTON = 1225;
+    public static double FEEDER_TIME = 1000;
+    public static double SHOOTING_TIME = 2000;
+    private int shots = 0;
     private RobotCommon common;
+    private int state = 0;
+    private ElapsedTime stateTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -50,34 +43,67 @@ public class TestAuton extends LinearOpMode {
 
         waitForStart();
         if (opModeIsActive()) {
-            int state = 0;
 
             while (opModeIsActive()) {
                 follower.update();
                 switch (state) {
                     case 0:
+                        common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
+                        common.setShooterTarget(SHOOTER_AUTON);
                         follower.followPath(halfShotPath);
-                        state = 1;
+                        changeState(1);
                         break;
                     case 1:
                         if(!follower.isBusy()){
-                            state = 2;
+                            changeState(2);
                         }
                         break;
                     case 2:
+                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+                        changeState(3);
+                        break;
+                    case 3:
+                        if (stateTime.milliseconds() > FEEDER_TIME) {
+                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(4);
+                        }
+                        break;
+                    case 4:
+                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                            shots++;
+                            if (shots < 3) {
+                                changeState(2);
+                            } else {
+                                changeState(5);
+                            }
+                        }
+                        break;
+                    case 5:
+                        common.setShooterTarget(0);
                         follower.followPath(ballPickPath);
-                        state = 3;
+                        changeState(6);
+                        break;
+                    case 6:
+                        if (!follower.isBusy()) {
+                            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(7);
+                        }
                         break;
                 }
                 telemetry.addData("state",state);
+                telemetry.addData("shots",shots);
                 telemetry.addData("x", follower.getPose().getX());
                 telemetry.addData("y", follower.getPose().getY());
                 telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
                 telemetry.addData("followerBusy", follower.isBusy());
-                common.run();
+                common.runAuton();
                 common.sendTelemetry(telemetry);
             }
         }
+    }
+    private void changeState(int newState) {
+        state = newState;
+        stateTime.reset();
     }
 
     private void initialize() {

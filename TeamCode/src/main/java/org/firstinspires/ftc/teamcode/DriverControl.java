@@ -45,11 +45,11 @@ public class DriverControl extends LinearOpMode {
 
     private void controls() {
         if (gamepad2.a) {
-            common.setIntakePower(1);
+            common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
         } else if (gamepad2.b) {
-            common.setIntakePower(-1);
+            common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
         } else {
-            common.setIntakePower(0);
+            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
         }
         if (gamepad1.dpad_up) {
             common.setLiftTargetPosition(LIFT_UP);
@@ -69,11 +69,11 @@ public class DriverControl extends LinearOpMode {
         }
 
         if (gamepad2.right_bumper) {
-            common.setFeederVelocity(RobotCommon.FeederOptions.IN);
+            common.setFeederDirection(RobotCommon.ShaftDirection.IN);
         } else if (gamepad2.left_bumper) {
-            common.setFeederVelocity(RobotCommon.FeederOptions.OUT);
+            common.setFeederDirection(RobotCommon.ShaftDirection.OUT);
         } else {
-            common.setFeederVelocity(RobotCommon.FeederOptions.STOP);
+            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
         }
         double speed = ROBOT_SPEED;
         if (gamepad1.a) {
