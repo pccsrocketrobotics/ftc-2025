@@ -28,32 +28,24 @@ import java.util.function.Supplier;
 @Autonomous
 public class TestAuton extends LinearOpMode {
     private Follower follower;
-    public static Pose startingPose1;
-    public static Pose endingPose1;
+    public static Pose startingPose = new Pose(0,0,Math.toRadians(0));
+    public static Pose halfShotPose = new Pose(-30,-27,Math.toRadians(45));
+    public static Pose ballPickingPose= new Pose(-45,-12,Math.toRadians(90));
     private boolean automatedDrive;
     private Supplier<PathChain> pathChain;
     private RobotCommon common;
 
     @Override
     public void runOpMode() {
-
-        follower.setMaxPower(1.00); //causes code to crash with NullPointerExeption error
         initialize();
-        Pose wallStartPose = new Pose(0, 0, Math.toRadians(0));
-        Pose gateStartPose = new Pose(198, 10, Math.toRadians(40));
-        Pose wallShootingPose = new Pose(0, 0, Math.toRadians(20));
-        Pose gateShootingPose = new Pose(61, 0, Math.toRadians(45));
-        Pose gateEndPose = new Pose(160, 10, Math.toRadians(90));
-        Pose wallEndPose = new Pose(30, 10, Math.toRadians(90));
 
-        follower.setStartingPose(wallStartPose);
-
-        PathChain wallShooting = follower.pathBuilder()
-                .addPath(new BezierLine(new Pose(wallStartPose.getX(),wallStartPose.getY()), new Pose(wallShootingPose.getX(), wallShootingPose.getY())))
-                .setLinearHeadingInterpolation(wallStartPose.getHeading(),wallShootingPose.getHeading())
-                //.addPath(new BezierLine(new Point(whitePose), new Point(whitePose)))
-                //.setPathEndTimeoutConstraint(0)
-                //STARTED FIRST PATH CALL IT NEXT TIME
+        PathChain halfShotPath = follower.pathBuilder()
+                .addPath(new BezierLine(startingPose,halfShotPose))
+                .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
+                .build();
+        PathChain ballPickPath = follower.pathBuilder()
+                .addPath(new BezierLine(halfShotPose,ballPickingPose))
+                .setLinearHeadingInterpolation(halfShotPose.getHeading(),ballPickingPose.getHeading())
                 .build();
 
         waitForStart();
@@ -73,7 +65,7 @@ public class TestAuton extends LinearOpMode {
         common = new RobotCommon();
         common.initialize(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose1 == null ? new Pose(0, 0) : startingPose1);
+        follower.setStartingPose(startingPose);
         follower.update();
         common.odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
     }

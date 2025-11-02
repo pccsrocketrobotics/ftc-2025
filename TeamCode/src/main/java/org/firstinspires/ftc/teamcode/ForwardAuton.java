@@ -7,13 +7,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Autonomous(preselectTeleOp = "DriverControl")
 @Config
-public class SimpleAuton extends LinearOpMode {
+public class ForwardAuton extends LinearOpMode {
     private RobotCommon common;
     public static double ROBOT_SPEED = 1500;
     public static double ROBOT_FAST = 3000;
