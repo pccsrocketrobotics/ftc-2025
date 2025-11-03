@@ -41,6 +41,7 @@ public class DriverControl extends LinearOpMode {
         common = new RobotCommon();
         common.initialize(hardwareMap);
         common.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
+        common.sendTelemetry(telemetry);
     }
 
     private void controls() {

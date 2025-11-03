@@ -33,13 +33,7 @@ public class RobotCommon {
     private double backRightTarget;
     private int liftTargetPosition;
     public double shooterTarget;
-    private double rightFeederVelocity;
-    private double leftFeederVelocity;
-    public static double SHOOTER_P = 0;
-    public static double SHOOTER_I = 0;
-    public static double SHOOTER_D = 0;
-    public static double SHOOTER_F = 0.00063;
-    private PIDFCoefficients shooterCoefficients = new PIDFCoefficients(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
+    public static PIDFCoefficients shooterCoefficients = new PIDFCoefficients(0.004, 0, 0, 0.0005);
     private PIDFController shooterController = new PIDFController(shooterCoefficients);
     private double shooterPower;
     private CRServo leftFeeder;
@@ -57,7 +51,7 @@ public class RobotCommon {
     private LED blueLed;
     private LED yellowLed1;
     private LED yellowLed2;
-    private ElapsedTime ledTimer = new ElapsedTime();
+    private final ElapsedTime ledTimer = new ElapsedTime();
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
@@ -150,7 +144,6 @@ public class RobotCommon {
     }
 
     private void runShooter() {
-        shooterCoefficients.setCoefficients(SHOOTER_P, SHOOTER_I, SHOOTER_D, SHOOTER_F);
         shooterController.setTargetPosition(shooterTarget);
         shooterController.updatePosition(shooter.getVelocity());
         shooterController.updateFeedForwardInput(shooterTarget);

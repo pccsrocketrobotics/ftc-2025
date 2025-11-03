@@ -12,11 +12,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @Autonomous
 @Config
 public class TestAuton extends LinearOpMode {
     private Follower follower;
+    private RobotCommon common;
     public static Pose startingPose = new Pose(0,0,Math.toRadians(0));
     public static Pose halfShotPose = new Pose(-30,-27,Math.toRadians(45));
     public static Pose ballPickingPose= new Pose(-45,-12,Math.toRadians(90));
@@ -24,9 +26,8 @@ public class TestAuton extends LinearOpMode {
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 2000;
     private int shots = 0;
-    private RobotCommon common;
     private int state = 0;
-    private ElapsedTime stateTime = new ElapsedTime();
+    private final ElapsedTime stateTime = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -90,14 +91,8 @@ public class TestAuton extends LinearOpMode {
                         }
                         break;
                 }
-                telemetry.addData("state",state);
-                telemetry.addData("shots",shots);
-                telemetry.addData("x", follower.getPose().getX());
-                telemetry.addData("y", follower.getPose().getY());
-                telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
-                telemetry.addData("followerBusy", follower.isBusy());
                 common.runAuton();
-                common.sendTelemetry(telemetry);
+                sendTelemetry();
             }
         }
     }
@@ -108,10 +103,23 @@ public class TestAuton extends LinearOpMode {
 
     private void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
         common = new RobotCommon();
         common.initialize(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();
+        sendTelemetry();
+    }
+
+    private void sendTelemetry() {
+        telemetry.addData("state",state);
+        telemetry.addData("shots",shots);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.addData("followerBusy", follower.isBusy());
+        RobotDrawing.draw(follower);
+        common.sendTelemetry(telemetry);
     }
 }
