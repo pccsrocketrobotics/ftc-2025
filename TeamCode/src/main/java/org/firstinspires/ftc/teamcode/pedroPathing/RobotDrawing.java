@@ -39,6 +39,7 @@ public class RobotDrawing {
      * @param follower
      */
     public static void draw(Follower follower) {
+        drawField();
         if (follower.getCurrentPath() != null) {
             drawPath(follower.getCurrentPath(), "#3F51B5");
             Pose closestPoint = follower.getPointFromPath(follower.getCurrentPath().getClosestPointTValue());
@@ -46,6 +47,12 @@ public class RobotDrawing {
         }
         drawPoseHistory(follower.getPoseHistory(), "#4CAF50");
         drawRobot(follower.getPose(), "#4CAF50");
+    }
+
+    public static void drawField() {
+        Canvas field = getTelemetryPacket().fieldOverlay();
+        field.drawImage("/images/decode-flipped.webp", 0, 0, 144, 144);
+        field.drawGrid(0, 0, 144, 144, 7, 7);
     }
 
     /**
