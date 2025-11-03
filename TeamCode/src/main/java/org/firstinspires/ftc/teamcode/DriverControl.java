@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
@@ -9,11 +8,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 
 @TeleOp
 @Config
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
+    private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     public static double ROBOT_SPEED = 1500;
     public static double ROBOT_FAST = 3000;
     public static int LIFT_UP = 1;
@@ -37,7 +38,7 @@ public class DriverControl extends LinearOpMode {
     }
 
     private void initialize() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
         common = new RobotCommon();
         common.initialize(hardwareMap);
         common.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");

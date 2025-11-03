@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
@@ -18,6 +19,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 @Config
 public class TestAuton extends LinearOpMode {
     private Follower follower;
+    private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
     public static Pose startingPose = new Pose(0,0,Math.toRadians(0));
     public static Pose halfShotPose = new Pose(-30,-27,Math.toRadians(45));
@@ -102,7 +104,7 @@ public class TestAuton extends LinearOpMode {
     }
 
     private void initialize() {
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
         RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
         common = new RobotCommon();
         common.initialize(hardwareMap);
@@ -119,7 +121,7 @@ public class TestAuton extends LinearOpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         telemetry.addData("followerBusy", follower.isBusy());
-        RobotDrawing.draw(follower);
+        RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
         common.sendTelemetry(telemetry);
     }
 }

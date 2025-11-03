@@ -38,19 +38,19 @@ public class RobotDrawing {
      *
      * @param follower
      */
-    public static void draw(Follower follower) {
-        drawField();
+    public static void draw(TelemetryPacket packet, Follower follower) {
+        drawField(packet);
         if (follower.getCurrentPath() != null) {
-            drawPath(follower.getCurrentPath(), "#3F51B5");
+            drawPath(packet, follower.getCurrentPath(), "#3F51B5");
             Pose closestPoint = follower.getPointFromPath(follower.getCurrentPath().getClosestPointTValue());
-            drawRobot(new Pose(closestPoint.getX(), closestPoint.getY(), follower.getCurrentPath().getHeadingGoal(follower.getCurrentPath().getClosestPointTValue())), "#3F51B5");
+            drawRobot(packet, new Pose(closestPoint.getX(), closestPoint.getY(), follower.getCurrentPath().getHeadingGoal(follower.getCurrentPath().getClosestPointTValue())), "#3F51B5");
         }
-        drawPoseHistory(follower.getPoseHistory(), "#4CAF50");
-        drawRobot(follower.getPose(), "#4CAF50");
+        drawPoseHistory(packet, follower.getPoseHistory(), "#4CAF50");
+        drawRobot(packet, follower.getPose(), "#4CAF50");
     }
 
-    public static void drawField() {
-        Canvas field = getTelemetryPacket().fieldOverlay();
+    public static void drawField(TelemetryPacket packet) {
+        Canvas field = packet.fieldOverlay();
         field.drawImage("/images/decode-flipped.webp", 0, 0, 144, 144);
         field.drawGrid(0, 0, 144, 144, 7, 7);
     }
@@ -62,8 +62,7 @@ public class RobotDrawing {
      * @param pose the Pose to draw the robot at
      * @param color the color to draw the robot with
      */
-    public static void drawRobot(Pose pose, String color) {
-        TelemetryPacket packet = getTelemetryPacket();
+    public static void drawRobot(TelemetryPacket packet, Pose pose, String color) {
         packet.fieldOverlay().setStroke(color);
         RobotDrawing.drawRobotOnCanvas(packet.fieldOverlay(), pose.copy());
     }
@@ -74,8 +73,7 @@ public class RobotDrawing {
      * @param path the Path to draw
      * @param color the color to draw the Path with
      */
-    public static void drawPath(Path path, String color) {
-        TelemetryPacket packet = getTelemetryPacket();
+    public static void drawPath(TelemetryPacket packet, Path path, String color) {
         packet.fieldOverlay().setStroke(color);
         RobotDrawing.drawPath(packet.fieldOverlay(), path.getPanelsDrawingPoints());
     }
@@ -86,9 +84,9 @@ public class RobotDrawing {
      * @param pathChain the PathChain to draw
      * @param color the color to draw the PathChain with
      */
-    public static void drawPath(PathChain pathChain, String color) {
+    public static void drawPath(TelemetryPacket packet, PathChain pathChain, String color) {
         for (int i = 0; i < pathChain.size(); i++) {
-            drawPath(pathChain.getPath(i), color);
+            drawPath(packet, pathChain.getPath(i), color);
         }
     }
     /**
@@ -98,8 +96,7 @@ public class RobotDrawing {
      * @param poseTracker the DashboardPoseTracker to get the pose history from
      * @param color the color to draw the pose history with
      */
-    public static void drawPoseHistory(PoseHistory poseTracker, String color) {
-        TelemetryPacket packet = getTelemetryPacket();
+    public static void drawPoseHistory(TelemetryPacket packet, PoseHistory poseTracker, String color) {
         packet.fieldOverlay().setStroke(color);
         packet.fieldOverlay().strokePolyline(poseTracker.getXPositionsArray(), poseTracker.getYPositionsArray());
     }
@@ -132,19 +129,5 @@ public class RobotDrawing {
      */
     public static void drawPath(Canvas c, double[][] points) {
         c.strokePolyline(points[0], points[1]);
-    }
-
-    private static TelemetryPacket getTelemetryPacket() {
-        return (TelemetryPacket) getPrivateField(dashboardTelemetry, "currentPacket");
-    }
-
-    public static Object getPrivateField(Object obj, String fieldName) {
-        try {
-            Field f = obj.getClass().getDeclaredField(fieldName);
-            f.setAccessible(true);
-            return f.get(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
