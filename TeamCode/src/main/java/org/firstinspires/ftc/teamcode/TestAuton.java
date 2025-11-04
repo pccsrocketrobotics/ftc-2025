@@ -26,7 +26,7 @@ public class TestAuton extends LinearOpMode {
     public static Pose ballPickingPose= new Pose(12.7,32.8,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1225;
     public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 2000;
+    public static double SHOOTING_TIME = 0;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -74,7 +74,7 @@ public class TestAuton extends LinearOpMode {
                     case 4:
                         if (stateTime.milliseconds() > SHOOTING_TIME) {
                             shots++;
-                            if (shots < 3) {
+                            if (shots < 2) {
                                 changeState(2);
                             } else {
                                 changeState(5);
