@@ -178,7 +178,7 @@ public class RobotCommon {
         if (shooter.getVelocity() < 100 && shooterTarget == 0) {
             ledTimer.reset();
             red = true;
-        } else if (Math.abs(shooter.getVelocity() - shooterTarget) < 50) {
+        } else if (Math.abs(shooter.getVelocity() - shooterTarget) < 100) {
             if (ledTimer.milliseconds() > 200) {
                 blue = true;
             } else {
