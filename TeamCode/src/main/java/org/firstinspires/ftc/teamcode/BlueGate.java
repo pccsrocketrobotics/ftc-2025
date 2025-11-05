@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @Autonomous
 @Config
-public class TestAuton extends LinearOpMode {
+public class BlueGateCH extends LinearOpMode {
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;

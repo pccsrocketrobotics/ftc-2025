@@ -36,6 +36,7 @@ public class RobotCommon {
     public static PIDFCoefficients shooterCoefficients = new PIDFCoefficients(0.004, 0, 0, 0.0005);
     private PIDFController shooterController = new PIDFController(shooterCoefficients);
     private double shooterPower;
+    private boolean fixJam;
     private CRServo leftFeeder;
     private CRServo rightFeeder;
     private ShaftDirection feederDirection = ShaftDirection.STOP;
@@ -144,6 +145,10 @@ public class RobotCommon {
     }
 
     private void runShooter() {
+        if(fixJam == true) {
+         shooter.setPower(-1);
+         return;
+        }
         shooterController.setTargetPosition(shooterTarget);
         shooterController.updatePosition(shooter.getVelocity());
         shooterController.updateFeedForwardInput(shooterTarget);
@@ -160,6 +165,11 @@ public class RobotCommon {
         leftLift.setTargetPosition(liftTargetPosition);
     }
     private void runFeeder() {
+        if(fixJam) {
+            rightFeeder.setPower(-1);
+            leftFeeder.setPower(-1);
+            return;
+        }
         if(feederDirection == ShaftDirection.IN) {
             rightFeeder.setPower(1);
             leftFeeder.setPower(1);
@@ -196,6 +206,10 @@ public class RobotCommon {
     //Setters
     public void setLiftTargetPosition(int liftTargetPosition) {
         this.liftTargetPosition = liftTargetPosition;
+    }
+
+    public void setJamFix(boolean fix) {
+        fixJam = fix;
     }
 
     public void setIntakeDirection(ShaftDirection intakeDirection) {

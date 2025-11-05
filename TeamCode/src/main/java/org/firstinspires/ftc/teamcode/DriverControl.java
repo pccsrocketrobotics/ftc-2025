@@ -62,13 +62,12 @@ public class DriverControl extends LinearOpMode {
         } else if (gamepad2.x) {
             shooterVelocity = SHOOTER_X;
             common.setShooterTarget(shooterVelocity);
-        } else if (gamepad2.dpad_down) {
-            shooterVelocity = -500;
-            common.setShooterTarget(shooterVelocity);
         } else if (gamepad2.guide) {
             shooterVelocity = 0;
             common.setShooterTarget(shooterVelocity);
         }
+
+        common.setJamFix(gamepad2.dpad_down);
 
         if (gamepad2.right_bumper) {
             common.setFeederDirection(RobotCommon.ShaftDirection.IN);
