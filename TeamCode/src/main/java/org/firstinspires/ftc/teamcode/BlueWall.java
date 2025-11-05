@@ -17,13 +17,14 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @Autonomous
 @Config
-public class BlueGate extends LinearOpMode {
+public class BlueWall extends LinearOpMode{
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
-    protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
-    protected Pose ballPickingPose= new Pose(12.7,32.8,Math.toRadians(90));
+    protected Pose startingPose = new Pose(-63,60,Math.toRadians(0));
+    protected Pose shootingPose = new Pose(6.7,14,Math.toRadians(41.6));
+    public static Pose pickupPose1 = new Pose(-12.7,24.8,Math.toRadians(90));
+    public static Pose pickupPose2 = new Pose(-13.6,42.6,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1225;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 0;
@@ -36,12 +37,12 @@ public class BlueGate extends LinearOpMode {
         initialize();
 
         PathChain halfShotPath = follower.pathBuilder()
-                .addPath(new BezierLine(startingPose,halfShotPose))
-                .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
+                .addPath(new BezierLine(startingPose, shootingPose))
+                .setLinearHeadingInterpolation(startingPose.getHeading(), shootingPose.getHeading())
                 .build();
         PathChain ballPickPath = follower.pathBuilder()
-                .addPath(new BezierLine(halfShotPose,ballPickingPose))
-                .setLinearHeadingInterpolation(halfShotPose.getHeading(),ballPickingPose.getHeading())
+                .addPath(new BezierLine(shootingPose, pickupPose2))
+                .setLinearHeadingInterpolation(shootingPose.getHeading(), pickupPose2.getHeading())
                 .build();
 
         waitForStart();
