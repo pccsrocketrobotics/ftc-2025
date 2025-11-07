@@ -26,7 +26,7 @@ public class BlueGate extends LinearOpMode {
     protected Pose ballPickingPose= new Pose(12.7,32.8,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1225;
     public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 0;
+    public static double SHOOTING_TIME = 500;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -48,7 +48,6 @@ public class BlueGate extends LinearOpMode {
         if (opModeIsActive()) {
 
             while (opModeIsActive()) {
-                follower.update();
                 switch (state) {
                     case 0:
                         common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
@@ -93,6 +92,8 @@ public class BlueGate extends LinearOpMode {
                         }
                         break;
                 }
+
+                follower.update();
                 common.runAuton();
                 sendTelemetry();
             }
@@ -117,10 +118,7 @@ public class BlueGate extends LinearOpMode {
     private void sendTelemetry() {
         telemetry.addData("state",state);
         telemetry.addData("shots",shots);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("followerBusy", follower.isBusy());
+        common.addPedroPathingTelemetry(dashboardTelemetry, follower);
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
         common.sendTelemetry(telemetry);
     }

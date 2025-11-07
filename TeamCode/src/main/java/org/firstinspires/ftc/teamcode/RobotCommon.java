@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -240,5 +241,29 @@ public class RobotCommon {
         telemetry.addData("intake",intakeDirection);
         telemetry.update();
     }
+    
+    public void addPedroPathingTelemetry(Telemetry telemetry, Follower follower) {
+        boolean hasPath = follower.getCurrentPath() != null;
+        telemetry.addData("hasPath", hasPath);
+        telemetry.addData("followerBusy", follower.isBusy());
+        telemetry.addData("atParametricEnd", hasPath && follower.atParametricEnd());
+        telemetry.addData("distanceTraveledOnPath", hasPath ? follower.getDistanceTraveledOnPath() : 0);
+        telemetry.addData("pathCompletion", hasPath ? follower.getPathCompletion() : 0);
+        telemetry.addData("distanceRemaining", hasPath ? follower.getDistanceRemaining() : 0);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("closestX", hasPath ? follower.getClosestPose().getPose().getX() : 0);
+        telemetry.addData("closestY", hasPath ? follower.getClosestPose().getPose().getY() : 0);
+        telemetry.addData("distanceClosest", hasPath ? follower.getPose().distanceFrom(follower.getClosestPose().getPose()) : 0);
+        telemetry.addData("velocityM", follower.getVelocity().getMagnitude());
+        telemetry.addData("velocityT", follower.getVelocity().getTheta());
+        telemetry.addData("accelerationM", follower.getAcceleration().getTheta());
+        telemetry.addData("accelerationT", follower.getAcceleration().getTheta());
 
+        telemetry.addData("driveError", follower.getDriveError());
+        telemetry.addData("headingError", follower.getHeadingError());
+        telemetry.addData("translationalErrorM", hasPath ? follower.getTranslationalError().getMagnitude() : 0);
+        telemetry.addData("translationalErrorT", hasPath ? follower.getTranslationalError().getTheta() : 0);
+    }
 }
