@@ -15,8 +15,8 @@ import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
-    public static double ROBOT_SPEED = 1500;
-    public static double ROBOT_FAST = 3000;
+    public static double ROBOT_SLOW = 1200;
+    public static double ROBOT_FAST = 2000;
     public static int LIFT_UP = 1;
     public static double SHOOTER_X = 1225;
     public static double SHOOTER_Y = 1550;
@@ -76,9 +76,9 @@ public class DriverControl extends LinearOpMode {
         } else {
             common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
         }
-        double speed = ROBOT_SPEED;
+        double speed = ROBOT_FAST;
         if (gamepad1.a) {
-            speed = ROBOT_FAST;
+            speed = ROBOT_SLOW;
         }
 
         double x = square(-gamepad1.left_stick_y) * speed;
@@ -89,7 +89,7 @@ public class DriverControl extends LinearOpMode {
         if (gamepad1.guide)  {
             common.odo.resetPosAndIMU();
         }
-        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * ROBOT_SPEED;
+        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * ROBOT_SLOW;
 
         common.setRobotSpeed(vx, vy, rot);
     }
