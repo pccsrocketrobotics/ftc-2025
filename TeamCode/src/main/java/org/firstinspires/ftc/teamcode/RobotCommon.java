@@ -41,6 +41,7 @@ public class RobotCommon {
     private boolean fixJam;
     private CRServo leftFeeder;
     private CRServo rightFeeder;
+    private CRServo agitator;
     private ShaftDirection feederDirection = ShaftDirection.STOP;
     private DcMotorEx shooter;
     private DcMotorEx frontLeft;
@@ -58,6 +59,7 @@ public class RobotCommon {
     public GoBildaPinpointDriver odo;
 
     public void initialize(HardwareMap hardwareMap) {
+        agitator = hardwareMap.get(CRServo.class, "agitator");
         leftLift = hardwareMap.get(DcMotorEx.class, "leftLift");
         rightLift = hardwareMap.get(DcMotorEx.class, "rightLift");
         shooter = hardwareMap.get(DcMotorEx.class, "shooter");
@@ -138,11 +140,14 @@ public class RobotCommon {
 //Runners
     private void runIntake() {
         if(intakeDirection == ShaftDirection.IN) {
-            intake.setPower(1);
+            intake.setPower(0.7);
+            agitator.setPower(-1);
         } else if(intakeDirection == ShaftDirection.OUT) {
             intake.setPower(-1);
+            agitator.setPower(0);
         } else {
             intake.setPower(0);
+            agitator.setPower(0);
         }
     }
 

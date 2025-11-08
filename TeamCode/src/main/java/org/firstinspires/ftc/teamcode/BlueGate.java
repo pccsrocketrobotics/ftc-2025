@@ -73,7 +73,7 @@ public class BlueGate extends LinearOpMode {
                     case 4:
                         if (stateTime.milliseconds() > SHOOTING_TIME) {
                             shots++;
-                            if (shots < 2) {
+                            if (shots < 3) {
                                 changeState(2);
                             } else {
                                 changeState(5);
