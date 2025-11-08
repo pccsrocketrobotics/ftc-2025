@@ -23,7 +23,8 @@ public class BlueGate extends LinearOpMode {
     private RobotCommon common;
     protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
-    protected Pose ballPickingPose= new Pose(12.7,32.8,Math.toRadians(90));
+    protected Pose ballAlignPose = new Pose(12.7,26.8,Math.toRadians(90));
+    protected Pose ballPickupPose = new Pose(12.7,45,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1200;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
@@ -39,10 +40,19 @@ public class BlueGate extends LinearOpMode {
                 .addPath(new BezierLine(startingPose,halfShotPose))
                 .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
                 .build();
-        PathChain ballPickPath = follower.pathBuilder()
-                .addPath(new BezierLine(halfShotPose,ballPickingPose))
-                .setLinearHeadingInterpolation(halfShotPose.getHeading(),ballPickingPose.getHeading())
+        PathChain ballAlignPath = follower.pathBuilder()
+                .addPath(new BezierLine(halfShotPose, ballAlignPose))
+                .setLinearHeadingInterpolation(halfShotPose.getHeading(), ballAlignPose.getHeading())
                 .build();
+        PathChain ballPickupPath = follower.pathBuilder()
+            .addPath(new BezierLine(ballAlignPose, ballPickupPose))
+            .build();
+        PathChain shootingPath2 = follower.pathBuilder()
+            .addPath(new BezierLine(ballPickupPose, ballAlignPose))
+            .setLinearHeadingInterpolation(ballPickupPose.getHeading(), ballAlignPose.getHeading())
+            .addPath(new BezierLine(ballAlignPose, halfShotPose))
+            .setLinearHeadingInterpolation(ballAlignPose.getHeading(), halfShotPose.getHeading())
+            .build();
 
         waitForStart();
         if (opModeIsActive()) {
@@ -82,16 +92,61 @@ public class BlueGate extends LinearOpMode {
                         break;
                     case 5:
                         common.setShooterTarget(0);
-                        follower.followPath(ballPickPath);
+                        follower.followPath(ballAlignPath);
                         changeState(6);
                         break;
                     case 6:
                         if (!follower.isBusy()) {
-                            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                             changeState(7);
                         }
                         break;
+                    case 7:
+                        follower.followPath(ballPickupPath);
+                        changeState(8);
+                        break;
+                    case 8:
+                        if (!follower.isBusy()) {
+                            changeState(9);
+                        }
+                        break;
+                    case 9:
+                        shots = 0;
+                        follower.followPath(shootingPath2);
+                        changeState(10);
+                        break;
+                    case 10:
+                        if (!follower.isBusy()) {
+                            changeState(11);
+                        }
+                        break;
+                    case 11:
+                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+                        changeState(12);
+                        break;
+                    case 12:
+                        if (stateTime.milliseconds() > FEEDER_TIME) {
+                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(13);
+                        }
+                        break;
+                    case 13:
+                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                            shots++;
+                            if (shots < 3) {
+                                changeState(11);
+                            } else {
+                                changeState(14);
+                            }
+                        }
+                        break;
+                    case 14:
+                        common.setShooterTarget(0);
+                        follower.followPath(ballAlignPath);
+                        changeState(15);
+                        common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+                        break;
                 }
+
 
                 follower.update();
                 common.runAuton();

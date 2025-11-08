@@ -15,4 +15,8 @@ public class RedWall extends BlueWall{
         pickupPose2 = RobotCommon.mirror(pickupPose2);
         super.runOpMode();
     }
+    @Override
+    protected void setBlackboard() {
+        blackboard.put("headingOffset", 90);
+    }
 }
