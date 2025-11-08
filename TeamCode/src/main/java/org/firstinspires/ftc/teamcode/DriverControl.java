@@ -21,6 +21,7 @@ public class DriverControl extends LinearOpMode {
     public static double SHOOTER_X = 1225;
     public static double SHOOTER_Y = 1550;
     private double shooterVelocity = 0;
+    private int headingOffset = 0;
     
     @Override
     public void runOpMode() {
@@ -43,6 +44,9 @@ public class DriverControl extends LinearOpMode {
         common.initialize(hardwareMap);
         common.odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo");
         common.sendTelemetry(telemetry);
+        if (blackboard.containsKey("headingOffset")) {
+            headingOffset = (int)blackboard.get("headingOffset");
+        }
     }
 
     private void controls() {
@@ -83,11 +87,13 @@ public class DriverControl extends LinearOpMode {
 
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
-        double heading = common.odo.getHeading(AngleUnit.RADIANS);
+        double heading = common.odo.getHeading(AngleUnit.RADIANS) + headingOffset;
         double vx = x * Math.cos(heading) - y * Math.sin(heading);
         double vy = x * Math.sin(heading) + y * Math.cos(heading);
         if (gamepad1.guide)  {
             common.odo.resetPosAndIMU();
+            headingOffset = 0;
+            blackboard.put("headingOffset", 0);
         }
         double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * ROBOT_SLOW;
 

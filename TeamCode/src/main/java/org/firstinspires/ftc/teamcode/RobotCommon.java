@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -265,5 +266,8 @@ public class RobotCommon {
         telemetry.addData("headingError", follower.getHeadingError());
         telemetry.addData("translationalErrorM", hasPath ? follower.getTranslationalError().getMagnitude() : 0);
         telemetry.addData("translationalErrorT", hasPath ? follower.getTranslationalError().getTheta() : 0);
+    }
+    public static Pose mirror(Pose p) {
+        return new Pose(p.getX(), -p.getY(), -p.getHeading());
     }
 }

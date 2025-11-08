@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
-@Autonomous
+@Autonomous(preselectTeleOp = "DriverControl")
 @Config
 public class BlueGate extends LinearOpMode {
     private Follower follower;
@@ -113,6 +113,10 @@ public class BlueGate extends LinearOpMode {
         follower.setStartingPose(startingPose);
         follower.update();
         sendTelemetry();
+        setBlackboard();
+    }
+    protected void setBlackboard() {
+        blackboard.put("headingOffset", -90);
     }
 
     private void sendTelemetry() {
