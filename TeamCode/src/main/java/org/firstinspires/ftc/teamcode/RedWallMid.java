@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(preselectTeleOp = "DriverControl")
 @Config
-public class RedWall extends BlueWall{
+public class RedWallMid extends BlueWallMid {
 
     @Override
     public void runOpMode() {

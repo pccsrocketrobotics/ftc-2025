@@ -16,15 +16,15 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @Autonomous(preselectTeleOp = "DriverControl")
 @Config
-public class BlueWall extends LinearOpMode{
+public class BlueWallFar extends LinearOpMode{
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(-63,16.8,Math.toRadians(0));
-    protected Pose shootingPose = new Pose(7.7,15,Math.toRadians(41.6));
-    public Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
-    public Pose pickupPose2 = new Pose(-12.7,45,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1300;
+    protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
+    protected Pose shootingPose = new Pose(-53.5,13.5,Math.toRadians(25));
+    public Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
+    public Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
+    public static double SHOOTER_AUTON = 1600;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     private int shots = 0;
@@ -36,22 +36,22 @@ public class BlueWall extends LinearOpMode{
         initialize();
 
         PathChain shootingPath = follower.pathBuilder()
-                .addPath(new BezierLine(startingPose, shootingPose))
-                .setLinearHeadingInterpolation(startingPose.getHeading(), shootingPose.getHeading())
-                .build();
+            .addPath(new BezierLine(startingPose, shootingPose))
+            .setLinearHeadingInterpolation(startingPose.getHeading(), shootingPose.getHeading())
+            .build();
         PathChain ballAlignPath = follower.pathBuilder()
-                .addPath(new BezierLine(shootingPose, alignPose2))
-                .setLinearHeadingInterpolation(shootingPose.getHeading(), alignPose2.getHeading())
-                .build();
+            .addPath(new BezierLine(shootingPose, alignPose3))
+            .setLinearHeadingInterpolation(shootingPose.getHeading(), alignPose3.getHeading())
+            .build();
         PathChain ballPickupPath = follower.pathBuilder()
-                .addPath(new BezierLine(alignPose2, pickupPose2))
-                .build();
+            .addPath(new BezierLine(alignPose3, pickupPose3))
+            .build();
         PathChain shootingPath2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickupPose2, alignPose2))
-                    .setLinearHeadingInterpolation(pickupPose2.getHeading(), alignPose2.getHeading())
-                .addPath(new BezierLine(alignPose2, shootingPose))
-                .setLinearHeadingInterpolation(alignPose2.getHeading(), shootingPose.getHeading())
-                .build();
+            .addPath(new BezierLine(pickupPose3, alignPose3))
+            .setLinearHeadingInterpolation(pickupPose3.getHeading(), alignPose3.getHeading())
+            .addPath(new BezierLine(alignPose3, shootingPose))
+            .setLinearHeadingInterpolation(alignPose3.getHeading(), shootingPose.getHeading())
+            .build();
 
         waitForStart();
         if (opModeIsActive()) {
