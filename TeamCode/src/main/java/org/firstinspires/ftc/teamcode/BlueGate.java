@@ -26,7 +26,7 @@ public class BlueGate extends LinearOpMode {
     protected Pose ballAlignPose = new Pose(12.7,26.8,Math.toRadians(90));
     protected Pose ballPickupPose = new Pose(12.7,45,Math.toRadians(90));
     protected Pose endPose = new Pose(4,26,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1200;
+    public static double SHOOTER_AUTON = 1300;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     private int shots = 0;

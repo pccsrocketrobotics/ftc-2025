@@ -22,8 +22,8 @@ public class BlueWall extends LinearOpMode{
     private RobotCommon common;
     protected Pose startingPose = new Pose(-63,16.8,Math.toRadians(0));
     protected Pose shootingPose = new Pose(7.7,15,Math.toRadians(41.6));
-    public static Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
-    public static Pose pickupPose2 = new Pose(-12.7,45,Math.toRadians(90));
+    public Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
+    public Pose pickupPose2 = new Pose(-12.7,45,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1300;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;

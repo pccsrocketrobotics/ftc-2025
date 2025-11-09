@@ -18,9 +18,9 @@ public class DriverControl extends LinearOpMode {
     public static double ROBOT_SLOW = 1200;
     public static double ROBOT_FAST = 2000;
     public static int LIFT_UP = 1;
-    public static double SHOOTER_X = 1225;
-    public static double SHOOTER_Y = 1550;
-    private double shooterVelocity = 0;
+    public static double SHOOTER_X = 1300;
+    public static double SHOOTER_Y = 1400;
+    public static double SHOOTER_START = 1600;
     private int headingOffset = 0;
     
     @Override
@@ -61,14 +61,13 @@ public class DriverControl extends LinearOpMode {
             common.setLiftTargetPosition(LIFT_UP);
         }
         if (gamepad2.y) {
-            shooterVelocity = SHOOTER_Y;
-            common.setShooterTarget(shooterVelocity);
+            common.setShooterTarget(SHOOTER_Y);
         } else if (gamepad2.x) {
-            shooterVelocity = SHOOTER_X;
-            common.setShooterTarget(shooterVelocity);
+            common.setShooterTarget(SHOOTER_X);
+        } else if (gamepad2.start) {
+            common.setShooterTarget(SHOOTER_START);
         } else if (gamepad2.guide) {
-            shooterVelocity = 0;
-            common.setShooterTarget(shooterVelocity);
+            common.setShooterTarget(0);
         }
 
         common.setJamFix(gamepad2.dpad_down);
