@@ -13,6 +13,7 @@ public class RedGate extends BlueGate{
         halfShotPose = RobotCommon.mirror(halfShotPose);
         ballAlignPose = RobotCommon.mirror(ballAlignPose);
         ballPickupPose = RobotCommon.mirror(ballPickupPose);
+        endPose = RobotCommon.mirror(endPose);
         super.runOpMode();
     }
     @Override

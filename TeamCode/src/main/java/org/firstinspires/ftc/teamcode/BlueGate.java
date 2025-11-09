@@ -25,6 +25,7 @@ public class BlueGate extends LinearOpMode {
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
     protected Pose ballAlignPose = new Pose(12.7,26.8,Math.toRadians(90));
     protected Pose ballPickupPose = new Pose(12.7,45,Math.toRadians(90));
+    protected Pose endPose = new Pose(4,26,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1200;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
@@ -53,6 +54,10 @@ public class BlueGate extends LinearOpMode {
             .addPath(new BezierLine(ballAlignPose, halfShotPose))
             .setLinearHeadingInterpolation(ballAlignPose.getHeading(), halfShotPose.getHeading())
             .build();
+        PathChain endPath = follower.pathBuilder()
+                .addPath(new BezierLine(halfShotPose, endPose))
+                .setLinearHeadingInterpolation(halfShotPose.getHeading(),endPose.getHeading())
+                .build();
 
         waitForStart();
         if (opModeIsActive()) {
@@ -91,7 +96,6 @@ public class BlueGate extends LinearOpMode {
                         }
                         break;
                     case 5:
-                        common.setShooterTarget(0);
                         follower.followPath(ballAlignPath);
                         changeState(6);
                         break;
@@ -141,7 +145,7 @@ public class BlueGate extends LinearOpMode {
                         break;
                     case 14:
                         common.setShooterTarget(0);
-                        follower.followPath(ballAlignPath);
+                        follower.followPath(endPath);
                         changeState(15);
                         common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                         break;
