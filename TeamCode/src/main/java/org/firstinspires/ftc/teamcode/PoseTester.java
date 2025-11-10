@@ -47,7 +47,7 @@ public class PoseTester extends LinearOpMode {
     }
 
     private void sendTelemetry() {
-        common.addPedroPathingTelemetry(dashboardTelemetry, follower);
+        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
         common.sendTelemetry(telemetry);
     }

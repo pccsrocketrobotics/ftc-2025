@@ -23,8 +23,8 @@ public class BlueWallMid extends LinearOpMode{
     protected Pose startingPose = new Pose(-63,16.8,Math.toRadians(0));
     protected Pose shootingPose = new Pose(7.7,15,Math.toRadians(41.6));
     public Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
-    public Pose pickupPose2 = new Pose(-12.7,45,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1400;
+    public Pose pickupPose2 = new Pose(-12.7,50,Math.toRadians(90));
+    public static double SHOOTER_AUTON = 1350;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     private int shots = 0;
@@ -167,6 +167,7 @@ public class BlueWallMid extends LinearOpMode{
         sendTelemetry();
         setBlackboard();
     }
+
     protected void setBlackboard() {
         blackboard.put("headingOffset", -90);
     }
@@ -174,10 +175,7 @@ public class BlueWallMid extends LinearOpMode{
     private void sendTelemetry() {
         telemetry.addData("state",state);
         telemetry.addData("shots",shots);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("followerBusy", follower.isBusy());
+        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
         common.sendTelemetry(telemetry);
     }

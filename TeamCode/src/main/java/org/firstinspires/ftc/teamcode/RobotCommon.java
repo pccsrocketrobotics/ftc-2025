@@ -248,29 +248,29 @@ public class RobotCommon {
         telemetry.update();
     }
     
-    public void addPedroPathingTelemetry(Telemetry telemetry, Follower follower) {
+    public void addPedroPathingTelemetry(Telemetry telemetry, Telemetry dashboardTelemetry, Follower follower) {
         boolean hasPath = follower.getCurrentPath() != null;
-        telemetry.addData("hasPath", hasPath);
-        telemetry.addData("followerBusy", follower.isBusy());
-        telemetry.addData("atParametricEnd", hasPath && follower.atParametricEnd());
-        telemetry.addData("distanceTraveledOnPath", hasPath ? follower.getDistanceTraveledOnPath() : 0);
-        telemetry.addData("pathCompletion", hasPath ? follower.getPathCompletion() : 0);
-        telemetry.addData("distanceRemaining", hasPath ? follower.getDistanceRemaining() : 0);
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("closestX", hasPath ? follower.getClosestPose().getPose().getX() : 0);
-        telemetry.addData("closestY", hasPath ? follower.getClosestPose().getPose().getY() : 0);
-        telemetry.addData("distanceClosest", hasPath ? follower.getPose().distanceFrom(follower.getClosestPose().getPose()) : 0);
-        telemetry.addData("velocityM", follower.getVelocity().getMagnitude());
-        telemetry.addData("velocityT", follower.getVelocity().getTheta());
-        telemetry.addData("accelerationM", follower.getAcceleration().getTheta());
-        telemetry.addData("accelerationT", follower.getAcceleration().getTheta());
+        dashboardTelemetry.addData("hasPath", hasPath);
+        dashboardTelemetry.addData("followerBusy", follower.isBusy());
+        dashboardTelemetry.addData("atParametricEnd", hasPath && follower.atParametricEnd());
+        dashboardTelemetry.addData("distanceTraveledOnPath", hasPath ? follower.getDistanceTraveledOnPath() : 0);
+        dashboardTelemetry.addData("pathCompletion", hasPath ? follower.getPathCompletion() : 0);
+        dashboardTelemetry.addData("distanceRemaining", hasPath ? follower.getDistanceRemaining() : 0);
+        dashboardTelemetry.addData("closestX", hasPath ? follower.getClosestPose().getPose().getX() : 0);
+        dashboardTelemetry.addData("closestY", hasPath ? follower.getClosestPose().getPose().getY() : 0);
+        dashboardTelemetry.addData("distanceClosest", hasPath ? follower.getPose().distanceFrom(follower.getClosestPose().getPose()) : 0);
+        dashboardTelemetry.addData("velocityM", follower.getVelocity().getMagnitude());
+        dashboardTelemetry.addData("velocityT", follower.getVelocity().getTheta());
+        dashboardTelemetry.addData("accelerationM", follower.getAcceleration().getTheta());
+        dashboardTelemetry.addData("accelerationT", follower.getAcceleration().getTheta());
 
-        telemetry.addData("driveError", follower.getDriveError());
-        telemetry.addData("headingError", follower.getHeadingError());
-        telemetry.addData("translationalErrorM", hasPath ? follower.getTranslationalError().getMagnitude() : 0);
-        telemetry.addData("translationalErrorT", hasPath ? follower.getTranslationalError().getTheta() : 0);
+        dashboardTelemetry.addData("driveError", follower.getDriveError());
+        dashboardTelemetry.addData("headingError", follower.getHeadingError());
+        dashboardTelemetry.addData("translationalErrorM", hasPath ? follower.getTranslationalError().getMagnitude() : 0);
+        dashboardTelemetry.addData("translationalErrorT", hasPath ? follower.getTranslationalError().getTheta() : 0);
     }
     public static Pose mirror(Pose p) {
         return new Pose(p.getX(), -p.getY(), -p.getHeading());

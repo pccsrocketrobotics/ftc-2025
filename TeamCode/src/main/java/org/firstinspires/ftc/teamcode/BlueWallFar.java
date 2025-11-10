@@ -21,10 +21,10 @@ public class BlueWallFar extends LinearOpMode{
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
-    protected Pose shootingPose = new Pose(-53.5,13.5,Math.toRadians(25));
+    protected Pose shootingPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
     public Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
     public Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1600;
+    public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     private int shots = 0;
@@ -174,10 +174,7 @@ public class BlueWallFar extends LinearOpMode{
     private void sendTelemetry() {
         telemetry.addData("state",state);
         telemetry.addData("shots",shots);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
-        telemetry.addData("followerBusy", follower.isBusy());
+        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
         common.sendTelemetry(telemetry);
     }
