@@ -47,8 +47,8 @@ public class SofiaTest extends LinearOpMode {
                 .setLinearHeadingInterpolation(halfShotPose.getHeading(), ballPickingPose1.getHeading())
                 .build();
         PathChain secondBallPath = follower.pathBuilder()
-                .addPath(new BezierLine(ballPickingPose1, ballAlignPose1))
-                .setLinearHeadingInterpolation(ballPickingPose1.getHeading(), ballAlignPose1.getHeading())
+                .addPath(new BezierLine(halfShotPose, ballAlignPose1))
+                .setLinearHeadingInterpolation(halfShotPose.getHeading(), ballAlignPose1.getHeading())
                 .addPath(new BezierLine(ballAlignPose1, ballAlignPose2))
                 .addPath(new BezierLine(ballAlignPose2, ballPickingPose2))
                 .addPath(new BezierLine(ballPickingPose2, halfShotPose))
@@ -93,14 +93,37 @@ public class SofiaTest extends LinearOpMode {
                         }
                         break;
                     case 5:
-                        common.setShooterTarget(0);
-                        follower.followPath(ballPickPath);
+                        follower.followPath(secondBallPath);
                         changeState(6);
                         break;
                     case 6:
                         if (!follower.isBusy()) {
-                            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                             changeState(7);
+                        }
+                        break;
+                    case 7:
+                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+                        changeState(8);
+                        break;
+                    case 8:
+                        if (stateTime.milliseconds() > FEEDER_TIME) {
+                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(9);
+                        }
+                        break;
+                    case 9:
+                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                            shots++;
+                            if (shots < 3) {
+                                changeState(7);
+                            } else {
+                                changeState(10);
+                            }
+                        }
+                    case 10:
+                        if (!follower.isBusy()) {
+                            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+                            common.setShooterTarget(0);
                         }
                         break;
                 }
