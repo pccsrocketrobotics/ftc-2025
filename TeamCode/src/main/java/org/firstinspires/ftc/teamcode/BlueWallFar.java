@@ -27,6 +27,7 @@ public class BlueWallFar extends LinearOpMode{
     public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
+    public static double START_DELAY = 3000;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -65,8 +66,7 @@ public class BlueWallFar extends LinearOpMode{
                         changeState(1);
                         break;
                     case 1:
-                        // TODO! Wait for 3 seconds for shooter to get up to speed!
-                        if(!follower.isBusy()){
+                        if(!follower.isBusy() && stateTime.milliseconds() > START_DELAY){
                             changeState(2);
                         }
                         break;
