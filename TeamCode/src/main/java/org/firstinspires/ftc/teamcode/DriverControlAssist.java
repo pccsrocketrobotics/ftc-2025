@@ -1,0 +1,118 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+
+import com.pedropathing.follower.Follower;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
+
+@TeleOp
+@Config
+public class DriverControlAssist extends LinearOpMode {
+    private RobotCommon common;
+    private Follower follower;
+    private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+    public static double ROBOT_SLOW = 0.5;
+    public static double ROBOT_FAST = 1;
+    public static double ROT_FAST = 0.5;
+    public static double ROT_SLOW = 0.3;
+    public static int LIFT_UP = 1;
+    public static double SHOOTER_X = 1300;
+    public static double SHOOTER_Y = 1400;
+    public static double SHOOTER_START = 1600;
+    private int headingOffset = 0;
+
+    @Override
+    public void runOpMode() {
+        initialize();
+
+        waitForStart();
+        if(opModeIsActive()) {
+            while (opModeIsActive()) {
+                controls();
+                follower.update();
+                common.runAuton();
+                sendTelemetry();
+            }
+        }
+    }
+
+    private void initialize() {
+        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
+        common = new RobotCommon();
+        common.initialize(hardwareMap);
+        follower = Constants.createFollower(hardwareMap);
+        follower.update();
+        follower.startTeleOpDrive(true);
+        sendTelemetry();
+        if (blackboard.containsKey("headingOffset")) {
+            headingOffset = (int)blackboard.get("headingOffset");
+        }
+    }
+
+    private void sendTelemetry() {
+        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
+        RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
+        common.sendTelemetry(telemetry);
+    }
+
+    private void controls() {
+        if (gamepad2.a) {
+            common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
+        } else if (gamepad2.b) {
+            common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
+        } else {
+            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+        }
+        if (gamepad1.dpad_up) {
+            common.setLiftTargetPosition(LIFT_UP);
+        }
+        if (gamepad2.y) {
+            common.setShooterTarget(SHOOTER_Y);
+        } else if (gamepad2.x) {
+            common.setShooterTarget(SHOOTER_X);
+        } else if (gamepad2.start) {
+            common.setShooterTarget(SHOOTER_START);
+        } else if (gamepad2.guide) {
+            common.setShooterTarget(0);
+        }
+
+        common.setJamFix(gamepad2.dpad_down);
+
+        if (gamepad2.right_bumper) {
+            common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+        } else if (gamepad2.left_bumper) {
+            common.setFeederDirection(RobotCommon.ShaftDirection.OUT);
+        } else {
+            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+        }
+        double speed = ROBOT_FAST;
+        double rotSpeed = ROT_FAST;
+        if (gamepad1.a) {
+            speed = ROBOT_SLOW;
+            rotSpeed = ROT_SLOW;
+        }
+
+        double x = square(-gamepad1.left_stick_y) * speed;
+        double y = square(gamepad1.left_stick_x) * speed;
+        if (gamepad1.guide)  {
+            headingOffset = 0;
+            blackboard.put("headingOffset", 0);
+        }
+        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
+
+        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
+
+    }
+    public static double square(double amount) {
+        return amount * Math.abs(amount);
+    }
+
+}
