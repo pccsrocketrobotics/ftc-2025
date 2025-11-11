@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
-@Autonomous(preselectTeleOp = "DriverControl")
+@Autonomous(preselectTeleOp = "DriverControl", group = "9 ball corner against goal")
 @Config
 public class BlueGate9 extends LinearOpMode {
     private Follower follower;

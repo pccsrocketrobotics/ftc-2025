@@ -8,7 +8,7 @@ import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(preselectTeleOp = "DriverControl")
+@Autonomous(preselectTeleOp = "DriverControl", group = "0 balls start anywhere (BACKUP)")
 @Config
 public class ForwardAuton extends LinearOpMode {
     private RobotCommon common;

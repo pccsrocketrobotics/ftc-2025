@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(preselectTeleOp = "DriverControl")
+@Autonomous(preselectTeleOp = "DriverControl", group = "6 ball aligned with puzzle piece by small tri shoots from small tri")
 @Config
 public class RedWallFar extends BlueWallFar {
 
