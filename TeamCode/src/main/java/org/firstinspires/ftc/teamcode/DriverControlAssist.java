@@ -4,6 +4,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -28,6 +31,9 @@ public class DriverControlAssist extends LinearOpMode {
     public static double SHOOTER_Y = 1400;
     public static double SHOOTER_START = 1600;
     private int headingOffset = 0;
+    protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
+    protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
+    protected Pose midShotPose = new Pose(6.7,14,Math.toRadians(41.6));
 
     @Override
     public void runOpMode() {
@@ -48,7 +54,10 @@ public class DriverControlAssist extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
         common = new RobotCommon();
         common.initialize(hardwareMap);
-        follower = Constants.createFollower(hardwareMap);
+        follower = (Follower) blackboard.get("follower");
+        if (follower == null) {
+            follower = Constants.createFollower(hardwareMap);
+        }
         follower.update();
         follower.startTeleOpDrive(true);
         sendTelemetry();
@@ -60,6 +69,8 @@ public class DriverControlAssist extends LinearOpMode {
     private void sendTelemetry() {
         common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
+        telemetry.addData("headingOffset", headingOffset);
+        telemetry.addData("isTeleopDrive", follower.isTeleopDrive());
         common.sendTelemetry(telemetry);
     }
 
@@ -93,6 +104,51 @@ public class DriverControlAssist extends LinearOpMode {
         } else {
             common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
         }
+
+        if (gamepad1.x) {
+            if (follower.isTeleopDrive()) {
+                Pose target = halfShotPose;
+                if (headingOffset > 0) {
+                    target = RobotCommon.mirror(target);
+                }
+                PathChain path = follower.pathBuilder()
+                        .addPath(new BezierLine(follower.getPose(), target))
+                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                        .build();
+                follower.followPath(path);
+
+            }
+        } else if (gamepad1.y) {
+            if (follower.isTeleopDrive()) {
+                Pose target = midShotPose;
+                if (headingOffset > 0) {
+                    target = RobotCommon.mirror(target);
+                }
+                PathChain path = follower.pathBuilder()
+                        .addPath(new BezierLine(follower.getPose(), target))
+                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                        .build();
+                follower.followPath(path);
+
+            }
+        } else if (gamepad1.start) {
+            if (follower.isTeleopDrive()) {
+                Pose target = farShotPose;
+                if (headingOffset > 0) {
+                    target = RobotCommon.mirror(target);
+                }
+                PathChain path = follower.pathBuilder()
+                        .addPath(new BezierLine(follower.getPose(), target))
+                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                        .build();
+                follower.followPath(path);
+
+            }
+        } else {
+            if (!follower.isTeleopDrive()) {
+                follower.startTeleOpDrive(true);
+            }
+        }
         double speed = ROBOT_FAST;
         double rotSpeed = ROT_FAST;
         if (gamepad1.a) {
@@ -103,12 +159,12 @@ public class DriverControlAssist extends LinearOpMode {
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
         if (gamepad1.guide)  {
-            headingOffset = 0;
-            blackboard.put("headingOffset", 0);
+            headingOffset = (int) Math.toDegrees(-follower.getHeading());
+            blackboard.put("headingOffset", headingOffset);
         }
         double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
 
-        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
+        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(-headingOffset));
 
     }
     public static double square(double amount) {

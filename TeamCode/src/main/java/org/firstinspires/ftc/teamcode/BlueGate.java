@@ -171,6 +171,7 @@ public class BlueGate extends LinearOpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();
+        blackboard.put("follower", follower);
         sendTelemetry();
         setBlackboard();
     }
