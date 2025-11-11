@@ -10,7 +10,7 @@ public class RedWallMid extends BlueWallMid {
     @Override
     public void runOpMode() {
         startingPose = RobotCommon.mirror(startingPose);
-        shootingPose = RobotCommon.mirror(shootingPose);
+        midShotPose = RobotCommon.mirror(midShotPose);
         alignPose2 = RobotCommon.mirror(alignPose2);
         pickupPose2 = RobotCommon.mirror(pickupPose2);
         super.runOpMode();

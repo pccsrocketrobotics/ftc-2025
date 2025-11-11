@@ -252,7 +252,7 @@ public class RobotCommon {
         boolean hasPath = follower.getCurrentPath() != null;
         telemetry.addData("x", follower.getPose().getX());
         telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         dashboardTelemetry.addData("hasPath", hasPath);
         dashboardTelemetry.addData("followerBusy", follower.isBusy());
         dashboardTelemetry.addData("atParametricEnd", hasPath && follower.atParametricEnd());

@@ -23,8 +23,8 @@ public class BlueGate extends LinearOpMode {
     private RobotCommon common;
     protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
     protected Pose halfShotPose = new Pose(28.5,28,Math.toRadians(45));
-    protected Pose ballAlignPose = new Pose(12.7,26.8,Math.toRadians(90));
-    protected Pose ballPickupPose = new Pose(12.7,50,Math.toRadians(90));
+    protected Pose alignPose1 = new Pose(12.7,26.8,Math.toRadians(90));
+    protected Pose pickupPose1 = new Pose(12.7,50,Math.toRadians(90));
     protected Pose endPose = new Pose(4,26,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1375;
     public static double FEEDER_TIME = 1000;
@@ -37,27 +37,27 @@ public class BlueGate extends LinearOpMode {
     public void runOpMode() {
         initialize();
 
-        PathChain halfShotPath = follower.pathBuilder()
-                .addPath(new BezierLine(startingPose,halfShotPose))
-                .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
-                .build();
+        PathChain shootingPath = follower.pathBuilder()
+            .addPath(new BezierLine(startingPose,halfShotPose))
+            .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
+            .build();
         PathChain ballAlignPath = follower.pathBuilder()
-                .addPath(new BezierLine(halfShotPose, ballAlignPose))
-                .setLinearHeadingInterpolation(halfShotPose.getHeading(), ballAlignPose.getHeading())
-                .build();
+            .addPath(new BezierLine(halfShotPose, alignPose1))
+            .setLinearHeadingInterpolation(halfShotPose.getHeading(), alignPose1.getHeading())
+            .build();
         PathChain ballPickupPath = follower.pathBuilder()
-            .addPath(new BezierLine(ballAlignPose, ballPickupPose))
+            .addPath(new BezierLine(alignPose1, pickupPose1))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(ballPickupPose, ballAlignPose))
-            .setLinearHeadingInterpolation(ballPickupPose.getHeading(), ballAlignPose.getHeading())
-            .addPath(new BezierLine(ballAlignPose, halfShotPose))
-            .setLinearHeadingInterpolation(ballAlignPose.getHeading(), halfShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose1, alignPose1))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose1.getHeading())
+            .addPath(new BezierLine(alignPose1, halfShotPose))
+            .setLinearHeadingInterpolation(alignPose1.getHeading(), halfShotPose.getHeading())
             .build();
         PathChain endPath = follower.pathBuilder()
-                .addPath(new BezierLine(halfShotPose, endPose))
-                .setLinearHeadingInterpolation(halfShotPose.getHeading(),endPose.getHeading())
-                .build();
+            .addPath(new BezierLine(halfShotPose, endPose))
+            .setLinearHeadingInterpolation(halfShotPose.getHeading(),endPose.getHeading())
+            .build();
 
         waitForStart();
         if (opModeIsActive()) {
@@ -67,7 +67,7 @@ public class BlueGate extends LinearOpMode {
                     case 0:
                         common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
                         common.setShooterTarget(SHOOTER_AUTON);
-                        follower.followPath(halfShotPath);
+                        follower.followPath(shootingPath);
                         changeState(1);
                         break;
                     case 1:

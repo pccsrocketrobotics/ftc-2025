@@ -10,21 +10,25 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @Autonomous(preselectTeleOp = "DriverControl")
 @Config
-public class BlueWallMid extends LinearOpMode{
+public class BlueGate9 extends LinearOpMode {
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(-63,16.8,Math.toRadians(0));
-    protected Pose midShotPose = new Pose(7.7,15,Math.toRadians(41.6));
+    protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
+    protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
+    protected Pose alignPose1 = new Pose(12.7,26.8,Math.toRadians(90));
+    protected Pose pickupPose1 = new Pose(12.7,50,Math.toRadians(90));
     protected Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
     protected Pose pickupPose2 = new Pose(-12.7,50,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1350;
+    protected Pose halfShotPose2 = new Pose(34,20.5,Math.toRadians(54));
+    public static double SHOOTER_AUTON = 1375;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     private int shots = 0;
@@ -36,22 +40,36 @@ public class BlueWallMid extends LinearOpMode{
         initialize();
 
         PathChain shootingPath = follower.pathBuilder()
-            .addPath(new BezierLine(startingPose, midShotPose))
-            .setLinearHeadingInterpolation(startingPose.getHeading(), midShotPose.getHeading())
+            .addPath(new BezierLine(startingPose,halfShotPose))
+            .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
             .build();
         PathChain ballAlignPath = follower.pathBuilder()
-            .addPath(new BezierLine(midShotPose, alignPose2))
-            .setLinearHeadingInterpolation(midShotPose.getHeading(), alignPose2.getHeading())
+            .addPath(new BezierLine(halfShotPose, alignPose1))
+            .setLinearHeadingInterpolation(halfShotPose.getHeading(), alignPose1.getHeading())
             .build();
         PathChain ballPickupPath = follower.pathBuilder()
-            .addPath(new BezierLine(alignPose2, pickupPose2))
+            .addPath(new BezierLine(alignPose1, pickupPose1))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose2, alignPose2))
-            .setLinearHeadingInterpolation(pickupPose2.getHeading(), alignPose2.getHeading())
-            .addPath(new BezierLine(alignPose2, midShotPose))
-            .setLinearHeadingInterpolation(alignPose2.getHeading(), midShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose1, alignPose1))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose1.getHeading())
+            .addPath(new BezierLine(alignPose1, halfShotPose))
+            .setLinearHeadingInterpolation(alignPose1.getHeading(), halfShotPose.getHeading())
             .build();
+        PathChain ballAlignPath2 = follower.pathBuilder()
+            .addPath(new BezierLine(halfShotPose, alignPose2))
+            .setLinearHeadingInterpolation(halfShotPose.getHeading(), alignPose2.getHeading())
+            .build();
+        PathChain ballPickupPath2 = follower.pathBuilder()
+            .addPath(new BezierLine(alignPose2, pickupPose2))
+            .build();
+        PathChain shootingPath3 = follower.pathBuilder()
+            .addPath(new BezierLine(pickupPose2, alignPose2))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose2.getHeading())
+            .addPath(new BezierLine(alignPose2, halfShotPose2))
+            .setLinearHeadingInterpolation(alignPose2.getHeading(), halfShotPose2.getHeading())
+            .build();
+
 
         waitForStart();
         if (opModeIsActive()) {
@@ -138,9 +156,56 @@ public class BlueWallMid extends LinearOpMode{
                         }
                         break;
                     case 14:
-                        common.setShooterTarget(0);
-                        follower.followPath(ballAlignPath);
+                        follower.followPath(ballAlignPath2);
                         changeState(15);
+                        break;
+                    case 15:
+                        if (!follower.isBusy()) {
+                            changeState(16);
+                        }
+                        break;
+                    case 16:
+                        follower.followPath(ballPickupPath2);
+                        changeState(17);
+                        break;
+                    case 17:
+                        if (!follower.isBusy()) {
+                            changeState(18);
+                        }
+                        break;
+                    case 18:
+                        shots = 0;
+                        follower.followPath(shootingPath3);
+                        changeState(19);
+                        break;
+                    case 19:
+                        if (!follower.isBusy()) {
+                            changeState(20);
+                        }
+                        break;
+                    case 20:
+                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+                        changeState(21);
+                        break;
+                    case 21:
+                        if (stateTime.milliseconds() > FEEDER_TIME) {
+                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(22);
+                        }
+                        break;
+                    case 22:
+                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                            shots++;
+                            if (shots < 3) {
+                                changeState(20);
+                            } else {
+                                changeState(23);
+                            }
+                        }
+                        break;
+                    case 23:
+                        common.setShooterTarget(0);
+                        changeState(24);
                         common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                         break;
                 }
@@ -167,7 +232,6 @@ public class BlueWallMid extends LinearOpMode{
         sendTelemetry();
         setBlackboard();
     }
-
     protected void setBlackboard() {
         blackboard.put("headingOffset", -90);
     }
@@ -180,3 +244,4 @@ public class BlueWallMid extends LinearOpMode{
         common.sendTelemetry(telemetry);
     }
 }
+

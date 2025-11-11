@@ -21,9 +21,9 @@ public class BlueWallFar extends LinearOpMode{
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
-    protected Pose shootingPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    public Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
-    public Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
+    protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
+    protected Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
+    protected Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
@@ -36,12 +36,12 @@ public class BlueWallFar extends LinearOpMode{
         initialize();
 
         PathChain shootingPath = follower.pathBuilder()
-            .addPath(new BezierLine(startingPose, shootingPose))
-            .setLinearHeadingInterpolation(startingPose.getHeading(), shootingPose.getHeading())
+            .addPath(new BezierLine(startingPose, farShotPose))
+            .setLinearHeadingInterpolation(startingPose.getHeading(), farShotPose.getHeading())
             .build();
         PathChain ballAlignPath = follower.pathBuilder()
-            .addPath(new BezierLine(shootingPose, alignPose3))
-            .setLinearHeadingInterpolation(shootingPose.getHeading(), alignPose3.getHeading())
+            .addPath(new BezierLine(farShotPose, alignPose3))
+            .setLinearHeadingInterpolation(farShotPose.getHeading(), alignPose3.getHeading())
             .build();
         PathChain ballPickupPath = follower.pathBuilder()
             .addPath(new BezierLine(alignPose3, pickupPose3))
@@ -49,8 +49,8 @@ public class BlueWallFar extends LinearOpMode{
         PathChain shootingPath2 = follower.pathBuilder()
             .addPath(new BezierLine(pickupPose3, alignPose3))
             .setLinearHeadingInterpolation(pickupPose3.getHeading(), alignPose3.getHeading())
-            .addPath(new BezierLine(alignPose3, shootingPose))
-            .setLinearHeadingInterpolation(alignPose3.getHeading(), shootingPose.getHeading())
+            .addPath(new BezierLine(alignPose3, farShotPose))
+            .setLinearHeadingInterpolation(alignPose3.getHeading(), farShotPose.getHeading())
             .build();
 
         waitForStart();
@@ -65,6 +65,7 @@ public class BlueWallFar extends LinearOpMode{
                         changeState(1);
                         break;
                     case 1:
+                        // TODO! Wait for 3 seconds for shooter to get up to speed!
                         if(!follower.isBusy()){
                             changeState(2);
                         }

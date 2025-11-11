@@ -10,7 +10,7 @@ public class RedWallFar extends BlueWallFar {
     @Override
     public void runOpMode() {
         startingPose = RobotCommon.mirror(startingPose);
-        shootingPose = RobotCommon.mirror(shootingPose);
+        farShotPose = RobotCommon.mirror(farShotPose);
         alignPose3 = RobotCommon.mirror(alignPose3);
         pickupPose3 = RobotCommon.mirror(pickupPose3);
         super.runOpMode();
