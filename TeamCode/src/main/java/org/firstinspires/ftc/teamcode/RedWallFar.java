@@ -17,6 +17,6 @@ public class RedWallFar extends BlueWallFar {
     }
     @Override
     protected void setBlackboard() {
-        blackboard.put("headingOffset", 90);
+        blackboard.put("headingOffset", -90);
     }
 }

@@ -64,7 +64,7 @@ public class DriverControl extends LinearOpMode {
             common.setShooterTarget(SHOOTER_Y);
         } else if (gamepad2.x) {
             common.setShooterTarget(SHOOTER_X);
-        } else if (gamepad2.start) {
+        } else if (gamepad2.back) {
             common.setShooterTarget(SHOOTER_START);
         } else if (gamepad2.guide) {
             common.setShooterTarget(0);
@@ -86,7 +86,7 @@ public class DriverControl extends LinearOpMode {
 
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
-        double heading = common.odo.getHeading(AngleUnit.RADIANS) + headingOffset;
+        double heading = common.odo.getHeading(AngleUnit.RADIANS) - headingOffset;
         double vx = x * Math.cos(heading) - y * Math.sin(heading);
         double vy = x * Math.sin(heading) + y * Math.cos(heading);
         if (gamepad1.guide)  {

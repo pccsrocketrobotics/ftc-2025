@@ -170,7 +170,7 @@ public class BlueWallMid extends LinearOpMode{
     }
 
     protected void setBlackboard() {
-        blackboard.put("headingOffset", -90);
+        blackboard.put("headingOffset", 90);
     }
 
     private void sendTelemetry() {

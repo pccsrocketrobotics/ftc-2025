@@ -89,7 +89,7 @@ public class DriverControlAssist extends LinearOpMode {
             common.setShooterTarget(SHOOTER_Y);
         } else if (gamepad2.x) {
             common.setShooterTarget(SHOOTER_X);
-        } else if (gamepad2.start) {
+        } else if (gamepad2.back) {
             common.setShooterTarget(SHOOTER_START);
         } else if (gamepad2.guide) {
             common.setShooterTarget(0);
@@ -131,10 +131,10 @@ public class DriverControlAssist extends LinearOpMode {
                 follower.followPath(path);
 
             }
-        } else if (gamepad1.start) {
+        } else if (gamepad1.back) {
             if (follower.isTeleopDrive()) {
                 Pose target = farShotPose;
-                if (headingOffset > 0) {
+                if (headingOffset < 0) {
                     target = RobotCommon.mirror(target);
                 }
                 PathChain path = follower.pathBuilder()
@@ -159,12 +159,12 @@ public class DriverControlAssist extends LinearOpMode {
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
         if (gamepad1.guide)  {
-            headingOffset = (int) Math.toDegrees(-follower.getHeading());
+            headingOffset = (int) Math.toDegrees(follower.getHeading());
             blackboard.put("headingOffset", headingOffset);
         }
         double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
 
-        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(-headingOffset));
+        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
 
     }
     public static double square(double amount) {

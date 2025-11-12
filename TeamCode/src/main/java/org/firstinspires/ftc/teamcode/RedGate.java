@@ -18,7 +18,7 @@ public class RedGate extends BlueGate{
     }
     @Override
     protected void setBlackboard() {
-        blackboard.put("headingOffset", 90);
+        blackboard.put("headingOffset", -90);
     }
 
 }

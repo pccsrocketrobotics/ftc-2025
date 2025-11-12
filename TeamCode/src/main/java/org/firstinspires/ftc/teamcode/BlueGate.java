@@ -176,7 +176,7 @@ public class BlueGate extends LinearOpMode {
         setBlackboard();
     }
     protected void setBlackboard() {
-        blackboard.put("headingOffset", -90);
+        blackboard.put("headingOffset", 90);
     }
 
     private void sendTelemetry() {
