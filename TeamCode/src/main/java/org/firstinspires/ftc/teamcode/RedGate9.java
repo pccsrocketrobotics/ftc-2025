@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.robot.Robot;
 
-@Autonomous(preselectTeleOp = "DriverControl", group = "6 ball corner against goal")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "9 ball corner against goal")
 @Config
 public class RedGate9 extends BlueGate9{
 

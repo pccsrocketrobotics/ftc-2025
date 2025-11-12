@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
-@Autonomous(preselectTeleOp = "DriverControl", group = "6 ball aligned with puzzle piece by small tri shoots from small tri")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "6 ball aligned with puzzle piece by small tri shoots from small tri")
 @Config
 public class BlueWallFar extends LinearOpMode{
     private Follower follower;

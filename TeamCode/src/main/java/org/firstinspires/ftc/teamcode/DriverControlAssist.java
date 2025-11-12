@@ -60,10 +60,10 @@ public class DriverControlAssist extends LinearOpMode {
         }
         follower.update();
         follower.startTeleOpDrive(true);
-        sendTelemetry();
         if (blackboard.containsKey("headingOffset")) {
             headingOffset = (int)blackboard.get("headingOffset");
         }
+        sendTelemetry();
     }
 
     private void sendTelemetry() {
@@ -108,7 +108,7 @@ public class DriverControlAssist extends LinearOpMode {
         if (gamepad1.x) {
             if (follower.isTeleopDrive()) {
                 Pose target = halfShotPose;
-                if (headingOffset > 0) {
+                if (headingOffset < 0) {
                     target = RobotCommon.mirror(target);
                 }
                 PathChain path = follower.pathBuilder()
@@ -121,7 +121,7 @@ public class DriverControlAssist extends LinearOpMode {
         } else if (gamepad1.y) {
             if (follower.isTeleopDrive()) {
                 Pose target = midShotPose;
-                if (headingOffset > 0) {
+                if (headingOffset < 0) {
                     target = RobotCommon.mirror(target);
                 }
                 PathChain path = follower.pathBuilder()

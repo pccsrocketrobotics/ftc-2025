@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(preselectTeleOp = "DriverControl", group = "6 ball corner against goal")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "6 ball corner against goal")
 @Config
 public class RedGate extends BlueGate{
 
