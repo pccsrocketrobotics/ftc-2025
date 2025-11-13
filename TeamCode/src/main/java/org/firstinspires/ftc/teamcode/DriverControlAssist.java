@@ -27,13 +27,14 @@ public class DriverControlAssist extends LinearOpMode {
     public static double ROT_FAST = 0.5;
     public static double ROT_SLOW = 0.3;
     public static int LIFT_UP = 1;
-    public static double SHOOTER_X = 1300;
+    public static double SHOOTER_X = 1325;
     public static double SHOOTER_Y = 1400;
     public static double SHOOTER_START = 1600;
     private int headingOffset = 0;
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
     protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
     protected Pose midShotPose = new Pose(6.7,14,Math.toRadians(41.6));
+    protected Pose closeShotPose = new Pose(39, 0, Math.toRadians(67));
 
     @Override
     public void runOpMode() {
@@ -107,42 +108,19 @@ public class DriverControlAssist extends LinearOpMode {
 
         if (gamepad1.x) {
             if (follower.isTeleopDrive()) {
-                Pose target = halfShotPose;
-                if (headingOffset < 0) {
-                    target = RobotCommon.mirror(target);
-                }
-                PathChain path = follower.pathBuilder()
-                        .addPath(new BezierLine(follower.getPose(), target))
-                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
-                        .build();
-                follower.followPath(path);
-
+                goToPose(halfShotPose);
             }
         } else if (gamepad1.y) {
             if (follower.isTeleopDrive()) {
-                Pose target = midShotPose;
-                if (headingOffset < 0) {
-                    target = RobotCommon.mirror(target);
-                }
-                PathChain path = follower.pathBuilder()
-                        .addPath(new BezierLine(follower.getPose(), target))
-                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
-                        .build();
-                follower.followPath(path);
-
+                goToPose(midShotPose);
             }
         } else if (gamepad1.back) {
             if (follower.isTeleopDrive()) {
-                Pose target = farShotPose;
-                if (headingOffset < 0) {
-                    target = RobotCommon.mirror(target);
-                }
-                PathChain path = follower.pathBuilder()
-                        .addPath(new BezierLine(follower.getPose(), target))
-                        .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
-                        .build();
-                follower.followPath(path);
-
+                goToPose(farShotPose);
+            }
+        } else if (gamepad1.right_bumper) {
+            if (follower.isTeleopDrive()) {
+                goToPose(closeShotPose);
             }
         } else {
             if (!follower.isTeleopDrive()) {
@@ -167,6 +145,18 @@ public class DriverControlAssist extends LinearOpMode {
         follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
 
     }
+
+    private void goToPose(Pose target) {
+        if (headingOffset < 0) {
+            target = RobotCommon.mirror(target);
+        }
+        PathChain path = follower.pathBuilder()
+                .addPath(new BezierLine(follower.getPose(), target))
+                .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                .build();
+        follower.followPath(path);
+    }
+
     public static double square(double amount) {
         return amount * Math.abs(amount);
     }

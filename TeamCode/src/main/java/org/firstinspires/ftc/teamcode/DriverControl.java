@@ -18,7 +18,7 @@ public class DriverControl extends LinearOpMode {
     public static double ROBOT_SLOW = 1200;
     public static double ROBOT_FAST = 2000;
     public static int LIFT_UP = 1;
-    public static double SHOOTER_X = 1300;
+    public static double SHOOTER_X = 1325;
     public static double SHOOTER_Y = 1400;
     public static double SHOOTER_START = 1600;
     private int headingOffset = 0;
