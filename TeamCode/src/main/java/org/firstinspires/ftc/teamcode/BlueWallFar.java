@@ -48,10 +48,8 @@ public class BlueWallFar extends LinearOpMode{
             .addPath(new BezierLine(alignPose3, pickupPose3))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose3, alignPose3))
-            .setLinearHeadingInterpolation(pickupPose3.getHeading(), alignPose3.getHeading())
-            .addPath(new BezierLine(alignPose3, farShotPose))
-            .setLinearHeadingInterpolation(alignPose3.getHeading(), farShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose3, farShotPose))
+            .setLinearHeadingInterpolation(pickupPose3.getHeading(), farShotPose.getHeading())
             .build();
 
         waitForStart();

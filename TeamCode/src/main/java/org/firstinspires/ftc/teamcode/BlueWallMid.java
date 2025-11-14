@@ -47,10 +47,8 @@ public class BlueWallMid extends LinearOpMode{
             .addPath(new BezierLine(alignPose2, pickupPose2))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose2, alignPose2))
-            .setLinearHeadingInterpolation(pickupPose2.getHeading(), alignPose2.getHeading())
-            .addPath(new BezierLine(alignPose2, midShotPose))
-            .setLinearHeadingInterpolation(alignPose2.getHeading(), midShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose2, midShotPose))
+            .setLinearHeadingInterpolation(pickupPose2.getHeading(), midShotPose.getHeading())
             .build();
 
         waitForStart();

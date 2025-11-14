@@ -51,10 +51,8 @@ public class BlueGate9 extends LinearOpMode {
             .addPath(new BezierLine(alignPose1, pickupPose1))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose1, alignPose1))
-            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose1.getHeading())
-            .addPath(new BezierLine(alignPose1, halfShotPose))
-            .setLinearHeadingInterpolation(alignPose1.getHeading(), halfShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose1, halfShotPose))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose.getHeading())
             .build();
         PathChain ballAlignPath2 = follower.pathBuilder()
             .addPath(new BezierLine(halfShotPose, alignPose2))
@@ -64,10 +62,8 @@ public class BlueGate9 extends LinearOpMode {
             .addPath(new BezierLine(alignPose2, pickupPose2))
             .build();
         PathChain shootingPath3 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose2, alignPose2))
-            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose2.getHeading())
-            .addPath(new BezierLine(alignPose2, halfShotPose2))
-            .setLinearHeadingInterpolation(alignPose2.getHeading(), halfShotPose2.getHeading())
+            .addPath(new BezierLine(pickupPose2, halfShotPose2))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose2.getHeading())
             .build();
 
 

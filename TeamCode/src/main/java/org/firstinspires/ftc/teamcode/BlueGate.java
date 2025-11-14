@@ -49,10 +49,8 @@ public class BlueGate extends LinearOpMode {
             .addPath(new BezierLine(alignPose1, pickupPose1))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose1, alignPose1))
-            .setLinearHeadingInterpolation(pickupPose1.getHeading(), alignPose1.getHeading())
-            .addPath(new BezierLine(alignPose1, halfShotPose))
-            .setLinearHeadingInterpolation(alignPose1.getHeading(), halfShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose1, halfShotPose))
+            .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose.getHeading())
             .build();
         PathChain endPath = follower.pathBuilder()
             .addPath(new BezierLine(halfShotPose, endPose))
