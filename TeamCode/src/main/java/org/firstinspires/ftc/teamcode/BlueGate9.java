@@ -30,7 +30,7 @@ public class BlueGate9 extends LinearOpMode {
     protected Pose halfShotPose2 = new Pose(34,20.5,Math.toRadians(54));
     public static double SHOOTER_AUTON = 1375;
     public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 500;
+    public static double SHOOTING_TIME = 200;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 
-@TeleOp
+@TeleOp(group = "Backup")
 @Config
 public class DriverControl extends LinearOpMode {
     private RobotCommon common;
