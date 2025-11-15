@@ -10,25 +10,26 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
-@Autonomous(preselectTeleOp = "DriverControlAssist", group = "6 ball corner against goal")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "9 ball aligned with puzzle piece by small tri shoots from small tri")
 @Config
-public class BlueGate extends LinearOpMode {
+public class BlueWallFar9 extends LinearOpMode{
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
-    protected Pose halfShotPose = new Pose(28.5,28,Math.toRadians(46));
-    protected Pose alignPose1 = new Pose(12.7,26.8,Math.toRadians(90));
-    protected Pose pickupPose1 = new Pose(12.7,50,Math.toRadians(90));
-    protected Pose endPose = new Pose(4,26,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1325;
+    protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
+    protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
+    protected Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
+    protected Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
+    protected Pose alignPose2 = new Pose(-10,26.3,Math.toRadians(90));
+    protected Pose pickupPose2 = new Pose(-10,50,Math.toRadians(90));
+    public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
+    public static double START_DELAY = 3000;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -38,23 +39,30 @@ public class BlueGate extends LinearOpMode {
         initialize();
 
         PathChain shootingPath = follower.pathBuilder()
-            .addPath(new BezierLine(startingPose,halfShotPose))
-            .setLinearHeadingInterpolation(startingPose.getHeading(),halfShotPose.getHeading())
+            .addPath(new BezierLine(startingPose, farShotPose))
+            .setLinearHeadingInterpolation(startingPose.getHeading(), farShotPose.getHeading())
             .build();
         PathChain ballAlignPath = follower.pathBuilder()
-            .addPath(new BezierLine(halfShotPose, alignPose1))
-            .setLinearHeadingInterpolation(halfShotPose.getHeading(), alignPose1.getHeading())
+            .addPath(new BezierLine(farShotPose, alignPose3))
+            .setLinearHeadingInterpolation(farShotPose.getHeading(), alignPose3.getHeading())
             .build();
         PathChain ballPickupPath = follower.pathBuilder()
-            .addPath(new BezierLine(alignPose1, pickupPose1))
+            .addPath(new BezierLine(alignPose3, pickupPose3))
             .build();
         PathChain shootingPath2 = follower.pathBuilder()
-            .addPath(new BezierLine(pickupPose1, halfShotPose))
-            .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose.getHeading())
+            .addPath(new BezierLine(pickupPose3, farShotPose))
+            .setLinearHeadingInterpolation(pickupPose3.getHeading(), farShotPose.getHeading())
             .build();
-        PathChain endPath = follower.pathBuilder()
-            .addPath(new BezierLine(halfShotPose, endPose))
-            .setLinearHeadingInterpolation(halfShotPose.getHeading(),endPose.getHeading())
+        PathChain ballAlignPath2 = follower.pathBuilder()
+            .addPath(new BezierLine(farShotPose, alignPose2))
+            .setLinearHeadingInterpolation(farShotPose.getHeading(), alignPose2.getHeading())
+            .build();
+        PathChain ballPickupPath2 = follower.pathBuilder()
+            .addPath(new BezierLine(alignPose2, pickupPose2))
+            .build();
+        PathChain shootingPath3 = follower.pathBuilder()
+            .addPath(new BezierLine(pickupPose2, farShotPose))
+            .setLinearHeadingInterpolation(pickupPose2.getHeading(), farShotPose.getHeading())
             .build();
 
         waitForStart();
@@ -69,7 +77,7 @@ public class BlueGate extends LinearOpMode {
                         changeState(1);
                         break;
                     case 1:
-                        if(!follower.isBusy()){
+                        if(!follower.isBusy() && stateTime.milliseconds() > START_DELAY){
                             changeState(2);
                         }
                         break;
@@ -142,13 +150,60 @@ public class BlueGate extends LinearOpMode {
                         }
                         break;
                     case 14:
-                        common.setShooterTarget(0);
-                        follower.followPath(endPath);
+                        follower.followPath(ballAlignPath2);
                         changeState(15);
+                        break;
+                    case 15:
+                        if (!follower.isBusy()) {
+                            changeState(16);
+                        }
+                        break;
+                    case 16:
+                        follower.followPath(ballPickupPath2);
+                        changeState(17);
+                        break;
+                    case 17:
+                        if (!follower.isBusy()) {
+                            changeState(18);
+                        }
+                        break;
+                    case 18:
+                        shots = 0;
+                        follower.followPath(shootingPath3);
+                        changeState(19);
+                        break;
+                    case 19:
+                        if (!follower.isBusy()) {
+                            changeState(20);
+                        }
+                        break;
+                    case 20:
+                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+                        changeState(21);
+                        break;
+                    case 21:
+                        if (stateTime.milliseconds() > FEEDER_TIME) {
+                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(22);
+                        }
+                        break;
+                    case 22:
+                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                            shots++;
+                            if (shots < 3) {
+                                changeState(20);
+                            } else {
+                                changeState(23);
+                            }
+                        }
+                        break;
+                    case 23:
+                        common.setShooterTarget(0);
+                        follower.followPath(ballAlignPath);
+                        changeState(24);
                         common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                         break;
                 }
-
 
                 follower.update();
                 common.runAuton();
