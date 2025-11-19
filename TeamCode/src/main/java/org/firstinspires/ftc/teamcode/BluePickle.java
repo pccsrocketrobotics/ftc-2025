@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
-@Autonomous(preselectTeleOp = "DriverControlAssist", group = "9 ball aligned with puzzle piece by small tri shoots from small tri")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "Pick up from loading zone and shoot from small tri")
 @Config
 public class BluePickle extends LinearOpMode{
     private Follower follower;
@@ -22,15 +22,17 @@ public class BluePickle extends LinearOpMode{
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
     protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    protected Pose launchAlignPose1 = new Pose(-30,-63,Math.toRadians(90));
-    protected Pose launchPickupPose1 = new Pose(-63,-64,Math.toRadians(90));
-    protected Pose launchAlignPose2 = new Pose(-30,-63,Math.toRadians(90));
-    protected Pose launchPickupPose2 = new Pose(-63,-64,Math.toRadians(90));
+    protected Pose launchAlignPose1 = new Pose(-60,45,Math.toRadians(90));
+    protected Pose launchPickupPose1 = new Pose(-61,63,Math.toRadians(90));
+    protected Pose launchAlignPose2 = new Pose(-60,45,Math.toRadians(90));
+    protected Pose launchPickupPose2 = new Pose(-61,63,Math.toRadians(90));
+    protected Pose endPose = new Pose(-34,26.3,Math.toRadians(0));
+
     public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 200;
     public static double START_DELAY = 1000;
-    public static double PICKUP_TIME = 3000;
+    public static double PICKUP_TIME = 2000;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -65,6 +67,11 @@ public class BluePickle extends LinearOpMode{
                 .addPath(new BezierLine(launchPickupPose2, farShotPose))
                 .setLinearHeadingInterpolation(launchPickupPose2.getHeading(), farShotPose.getHeading())
                 .build();
+        PathChain endPath = follower.pathBuilder()
+            .addPath(new BezierLine(farShotPose, endPose))
+            .setLinearHeadingInterpolation(farShotPose.getHeading(), endPose.getHeading())
+            .build();
+
 
         waitForStart();
         if (opModeIsActive()) {
@@ -200,7 +207,7 @@ public class BluePickle extends LinearOpMode{
                         break;
                     case 23:
                         common.setShooterTarget(0);
-                        follower.followPath(launchAlignPath1);
+                        follower.followPath(endPath);
                         changeState(24);
                         common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                         break;

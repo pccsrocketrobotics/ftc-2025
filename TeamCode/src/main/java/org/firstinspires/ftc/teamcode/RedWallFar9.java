@@ -15,6 +15,7 @@ public class RedWallFar9 extends BlueWallFar9 {
         pickupPose3 = RobotCommon.mirror(pickupPose3);
         alignPose2 = RobotCommon.mirror(alignPose2);
         pickupPose2 = RobotCommon.mirror(pickupPose2);
+        endPose = RobotCommon.mirror(endPose);
         super.runOpMode();
     }
     @Override

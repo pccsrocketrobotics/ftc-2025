@@ -26,6 +26,8 @@ public class BlueWallFar9 extends LinearOpMode{
     protected Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
     protected Pose alignPose2 = new Pose(-10,26.3,Math.toRadians(90));
     protected Pose pickupPose2 = new Pose(-10,50,Math.toRadians(90));
+    protected Pose endPose = new Pose(-34,26.3,Math.toRadians(0));
+
     public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 200;
@@ -63,6 +65,10 @@ public class BlueWallFar9 extends LinearOpMode{
         PathChain shootingPath3 = follower.pathBuilder()
             .addPath(new BezierLine(pickupPose2, farShotPose))
             .setLinearHeadingInterpolation(pickupPose2.getHeading(), farShotPose.getHeading())
+            .build();
+        PathChain endPath = follower.pathBuilder()
+            .addPath(new BezierLine(farShotPose, endPose))
+            .setLinearHeadingInterpolation(farShotPose.getHeading(), endPose.getHeading())
             .build();
 
         waitForStart();
@@ -199,7 +205,7 @@ public class BlueWallFar9 extends LinearOpMode{
                         break;
                     case 23:
                         common.setShooterTarget(0);
-                        follower.followPath(ballAlignPath);
+                        follower.followPath(endPath);
                         changeState(24);
                         common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
                         break;

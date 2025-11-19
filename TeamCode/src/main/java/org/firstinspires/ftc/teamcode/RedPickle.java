@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(preselectTeleOp = "DriverControlAssist", group = "9 ball corner against goal")
+@Autonomous(preselectTeleOp = "DriverControlAssist", group = "Pick up from loading zone and shoot from small tri")
 @Config
 public class RedPickle extends BluePickle{
 
