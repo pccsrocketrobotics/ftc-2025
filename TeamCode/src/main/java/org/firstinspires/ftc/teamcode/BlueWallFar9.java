@@ -28,8 +28,8 @@ public class BlueWallFar9 extends LinearOpMode{
     protected Pose pickupPose2 = new Pose(-10,50,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1575;
     public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 500;
-    public static double START_DELAY = 3000;
+    public static double SHOOTING_TIME = 200;
+    public static double START_DELAY = 1000;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -92,7 +92,7 @@ public class BlueWallFar9 extends LinearOpMode{
                         }
                         break;
                     case 4:
-                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
                             shots++;
                             if (shots < 3) {
                                 changeState(2);
@@ -140,7 +140,7 @@ public class BlueWallFar9 extends LinearOpMode{
                         }
                         break;
                     case 13:
-                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
                             shots++;
                             if (shots < 3) {
                                 changeState(11);
@@ -188,7 +188,7 @@ public class BlueWallFar9 extends LinearOpMode{
                         }
                         break;
                     case 22:
-                        if (stateTime.milliseconds() > SHOOTING_TIME) {
+                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
                             shots++;
                             if (shots < 3) {
                                 changeState(20);
