@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
@@ -19,8 +21,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class RobotCommon {
 
-    public static int MAXWHEELSPEED = 5500;
-    private static int INTAKE_SPEED = 1500;
+    public static int MAX_WHEEL_SPEED = 5500;
     public static int LIFT_VELOCITY = 5000;
 
     private double vx;
@@ -37,7 +38,7 @@ public class RobotCommon {
     private int liftTargetPosition;
     public double shooterTarget;
     public static PIDFCoefficients shooterCoefficients = new PIDFCoefficients(0.004, 0, 0, 0.0005);
-    private PIDFController shooterController = new PIDFController(shooterCoefficients);
+    private final PIDFController shooterController = new PIDFController(shooterCoefficients);
     private double shooterPower;
     private boolean fixJam;
     private CRServo leftFeeder;
@@ -86,11 +87,10 @@ public class RobotCommon {
         leftFeeder.setDirection(CRServo.Direction.REVERSE);
 
         liftTargetPosition = rightLift.getCurrentPosition();
-        runLift();
+        rightLift.setTargetPosition(liftTargetPosition);
+        leftLift.setTargetPosition(liftTargetPosition);
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftLift.setVelocity(LIFT_VELOCITY);
-        rightLift.setVelocity(LIFT_VELOCITY);
 
         redLed.off();
         yellowLed1.off();
@@ -127,8 +127,8 @@ public class RobotCommon {
         backRightTarget = (vx + vy) - rot;
 
         double fastest = Math.max(Math.max(Math.abs(frontLeftTarget), Math.abs(frontRightTarget)), Math.max(Math.abs(backLeftTarget), Math.abs(backRightTarget)));
-        if (fastest > MAXWHEELSPEED) {
-            double scaleFactor = fastest / MAXWHEELSPEED;
+        if (fastest > MAX_WHEEL_SPEED) {
+            double scaleFactor = fastest / MAX_WHEEL_SPEED;
             frontLeftTarget = frontLeftTarget / scaleFactor;
             frontRightTarget = frontRightTarget / scaleFactor;
             backLeftTarget = backLeftTarget / scaleFactor;
@@ -155,7 +155,7 @@ public class RobotCommon {
     }
 
     private void runShooter() {
-        if(fixJam == true) {
+        if(fixJam) {
          shooter.setPower(-1);
          return;
         }
@@ -173,6 +173,8 @@ public class RobotCommon {
     private void runLift() {
         rightLift.setTargetPosition(liftTargetPosition);
         leftLift.setTargetPosition(liftTargetPosition);
+        leftLift.setVelocity(LIFT_VELOCITY);
+        rightLift.setVelocity(LIFT_VELOCITY);
     }
     private void runFeeder() {
         if(fixJam) {
@@ -234,6 +236,7 @@ public class RobotCommon {
     public void setFeederDirection(ShaftDirection feederDirection) {
         this.feederDirection = feederDirection;
     }
+    @SuppressLint("DefaultLocale")
     public void sendTelemetry(Telemetry telemetry) {
         //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData("vx", vx);
