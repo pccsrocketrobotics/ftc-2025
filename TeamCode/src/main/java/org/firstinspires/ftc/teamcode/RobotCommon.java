@@ -21,7 +21,8 @@ public class RobotCommon {
 
     public static int MAXWHEELSPEED = 5500;
     private static int INTAKE_SPEED = 1500;
-    public static int LIFT_MAX;
+    public static int LIFT_VELOCITY = 5000;
+
     private double vx;
     private double vy;
     private double rot;
@@ -88,6 +89,8 @@ public class RobotCommon {
         runLift();
         leftLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftLift.setVelocity(LIFT_VELOCITY);
+        rightLift.setVelocity(LIFT_VELOCITY);
 
         redLed.off();
         yellowLed1.off();
@@ -213,6 +216,9 @@ public class RobotCommon {
     //Setters
     public void setLiftTargetPosition(int liftTargetPosition) {
         this.liftTargetPosition = liftTargetPosition;
+    }
+    public int getLiftTargetPosition() {
+        return liftTargetPosition;
     }
 
     public void setJamFix(boolean fix) {

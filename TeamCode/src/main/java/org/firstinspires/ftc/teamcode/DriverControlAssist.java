@@ -2,16 +2,12 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
@@ -26,10 +22,11 @@ public class DriverControlAssist extends LinearOpMode {
     public static double ROBOT_FAST = 1;
     public static double ROT_FAST = 0.5;
     public static double ROT_SLOW = 0.3;
-    public static int LIFT_UP = 1;
+    public static int LIFT_MAX = 1;
     public static double SHOOTER_X = 1350;
     public static double SHOOTER_Y = 1400;
     public static double SHOOTER_START = 1550;
+    public static int LIFT_CHANGE = 10;
     private int headingOffset = 0;
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
     protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
@@ -85,7 +82,18 @@ public class DriverControlAssist extends LinearOpMode {
             common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
         }
         if (gamepad1.dpad_up) {
-            common.setLiftTargetPosition(LIFT_UP);
+            int pos = common.getLiftTargetPosition() + LIFT_CHANGE;
+            if (pos > LIFT_MAX) {
+                pos = LIFT_MAX;
+            }
+            common.setLiftTargetPosition(pos);
+        }
+        if (gamepad1.dpad_down) {
+            int pos = common.getLiftTargetPosition() - LIFT_CHANGE;
+            if (pos < 0) {
+                pos = 0;
+            }
+            common.setLiftTargetPosition(pos);
         }
         if (gamepad2.y) {
             common.setShooterTarget(SHOOTER_Y);
