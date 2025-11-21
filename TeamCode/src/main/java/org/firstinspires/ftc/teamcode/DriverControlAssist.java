@@ -35,6 +35,7 @@ public class DriverControlAssist extends LinearOpMode {
     protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
     protected Pose midShotPose = new Pose(0,0,Math.toRadians(45));
     protected Pose closeShotPose = new Pose(42, -4, Math.toRadians(75));
+    protected Pose parkingPose = new Pose(-39, -33, Math.toRadians(0));
 
     @Override
     public void runOpMode() {
@@ -121,6 +122,10 @@ public class DriverControlAssist extends LinearOpMode {
         } else if (gamepad1.right_bumper) {
             if (follower.isTeleopDrive()) {
                 goToPose(closeShotPose);
+            }
+        }else if (gamepad1.b) {
+            if (follower.isTeleopDrive()) {
+                goToPose(parkingPose);
             }
         } else {
             if (!follower.isTeleopDrive()) {
