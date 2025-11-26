@@ -91,18 +91,12 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
      * to +/-90 degrees if it's vertical, or 180 degrees if it's upside-down.
      */
     private Position cameraPosition = new Position(DistanceUnit.INCH,
-            0, 8.5, 12, 0);
+            0.25, 7.5, 12, 0);
     private YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
             0, -90 + 18, 0, 0);
 
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
     private AprilTagProcessor aprilTag;
 
-    /**
-     * The variable to store our instance of the vision portal.
-     */
     private VisionPortal visionPortal;
 
     @Override
@@ -155,8 +149,9 @@ public class ConceptAprilTagLocalization extends LinearOpMode {
                 // == CAMERA CALIBRATION ==
                 // If you do not manually specify calibration parameters, the SDK will attempt
                 // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
-                // ... these parameters are fx, fy, cx, cy.
+                .setLensIntrinsics(935.184, 935.184, 316.249, 254.729)
+
+            // ... these parameters are fx, fy, cx, cy.
 
                 .build();
 

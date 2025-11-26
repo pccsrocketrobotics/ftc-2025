@@ -44,6 +44,7 @@ public class DriverControlAssist extends LinearOpMode {
                 controls();
                 follower.update();
                 common.runAuton();
+                common.runAprilTags();
                 sendTelemetry();
             }
         }
@@ -53,6 +54,7 @@ public class DriverControlAssist extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
         common = new RobotCommon();
         common.initialize(hardwareMap);
+        common.initAprilTag(hardwareMap);
         follower = (Follower) blackboard.get("follower");
         if (follower == null) {
             follower = Constants.createFollower(hardwareMap);
