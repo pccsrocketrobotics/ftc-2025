@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -19,19 +20,17 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 public class BluePickle extends LinearOpMode{
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
     protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    protected Pose launchAlignPose1 = new Pose(-60,45,Math.toRadians(90));
-    protected Pose launchPickupPose1 = new Pose(-61,63,Math.toRadians(90));
-    protected Pose launchAlignPose2 = new Pose(-60,45,Math.toRadians(90));
-    protected Pose launchPickupPose2 = new Pose(-61,63,Math.toRadians(90));
-    protected Pose endPose = new Pose(-34,26.3,Math.toRadians(0));
-
-    public static double SHOOTER_AUTON = 1575;
+    protected Pose loadingPose1 = new Pose(-62,62,Math.toRadians(180));
+    protected Pose loadingPose2 = new Pose(-62,62,Math.toRadians(172));
+    protected Pose endPose = new Pose(-60,46,Math.toRadians(90));
+    public static double SHOOTER_AUTON = 1560;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 200;
-    public static double START_DELAY = 1000;
+    public static double START_DELAY = 1500;
     public static double PICKUP_TIME = 2000;
     private int shots = 0;
     private int state = 0;
@@ -45,27 +44,29 @@ public class BluePickle extends LinearOpMode{
                 .addPath(new BezierLine(startingPose, farShotPose))
                 .setLinearHeadingInterpolation(startingPose.getHeading(), farShotPose.getHeading())
                 .build();
-        PathChain launchAlignPath1 = follower.pathBuilder()
-                .addPath(new BezierLine(farShotPose, launchAlignPose1))
-                .setLinearHeadingInterpolation(farShotPose.getHeading(), launchAlignPose1.getHeading())
-                .build();
-        PathChain launchPickupPath1 = follower.pathBuilder()
-                .addPath(new BezierLine(launchAlignPose1, launchPickupPose1))
+        PathChain loadingZonePath = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                    farShotPose,
+                    new Pose(-41, 22),
+                    new Pose(-46, 67),
+                    loadingPose1
+                ))
                 .build();
         PathChain shootingPath2 = follower.pathBuilder()
-                .addPath(new BezierLine(launchPickupPose1, farShotPose))
-                .setLinearHeadingInterpolation(launchPickupPose1.getHeading(), farShotPose.getHeading())
+                .addPath(new BezierLine(loadingPose1, farShotPose))
+                .setLinearHeadingInterpolation(loadingPose1.getHeading(), farShotPose.getHeading())
                 .build();
-        PathChain launchAlignPath2 = follower.pathBuilder()
-                .addPath(new BezierLine(farShotPose, launchAlignPose2))
-                .setLinearHeadingInterpolation(farShotPose.getHeading(), launchAlignPose2.getHeading())
-                .build();
-        PathChain launchPickupPath2 = follower.pathBuilder()
-                .addPath(new BezierLine(launchAlignPose2, launchPickupPose2))
+        PathChain loadingZonePath2 = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                    farShotPose,
+                new Pose(-46,49),
+                new Pose (-43,59),
+                    loadingPose2
+                ))
                 .build();
         PathChain shootingPath3 = follower.pathBuilder()
-                .addPath(new BezierLine(launchPickupPose2, farShotPose))
-                .setLinearHeadingInterpolation(launchPickupPose2.getHeading(), farShotPose.getHeading())
+                .addPath(new BezierLine(loadingPose2, farShotPose))
+                .setLinearHeadingInterpolation(loadingPose2.getHeading(), farShotPose.getHeading())
                 .build();
         PathChain endPath = follower.pathBuilder()
             .addPath(new BezierLine(farShotPose, endPose))
@@ -110,19 +111,10 @@ public class BluePickle extends LinearOpMode{
                         }
                         break;
                     case 5:
-                        follower.followPath(launchAlignPath1);
+                        follower.followPath(loadingZonePath);
                         changeState(6);
                         break;
                     case 6:
-                        if (!follower.isBusy()) {
-                            changeState(7);
-                        }
-                        break;
-                    case 7:
-                        follower.followPath(launchPickupPath1);
-                        changeState(8);
-                        break;
-                    case 8:
                         if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME) {
                             changeState(9);
                         }
@@ -158,19 +150,10 @@ public class BluePickle extends LinearOpMode{
                         }
                         break;
                     case 14:
-                        follower.followPath(launchAlignPath2);
+                        follower.followPath(loadingZonePath2);
                         changeState(15);
                         break;
                     case 15:
-                        if (!follower.isBusy()) {
-                            changeState(16);
-                        }
-                        break;
-                    case 16:
-                        follower.followPath(launchPickupPath2);
-                        changeState(17);
-                        break;
-                    case 17:
                         if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME) {
                             changeState(18);
                         }

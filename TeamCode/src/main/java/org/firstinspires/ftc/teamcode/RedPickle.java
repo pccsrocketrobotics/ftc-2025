@@ -11,10 +11,9 @@ public class RedPickle extends BluePickle{
     public void runOpMode() {
         startingPose = RobotCommon.mirror(startingPose);
         farShotPose = RobotCommon.mirror(farShotPose);
-        launchAlignPose1 = RobotCommon.mirror(launchAlignPose1);
-        launchPickupPose1 = RobotCommon.mirror(launchPickupPose1);
-        launchAlignPose2 = RobotCommon.mirror(launchAlignPose2);
-        launchPickupPose2 = RobotCommon.mirror(launchPickupPose2);
+        loadingPose1 = RobotCommon.mirror(loadingPose1);
+        loadingPose2 = RobotCommon.mirror(loadingPose2);
+        endPose = RobotCommon.mirror(endPose);
         super.runOpMode();
     }
     @Override
