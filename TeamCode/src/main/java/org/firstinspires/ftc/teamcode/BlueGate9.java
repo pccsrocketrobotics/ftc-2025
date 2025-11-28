@@ -208,6 +208,8 @@ public class BlueGate9 extends LinearOpMode {
 
                 follower.update();
                 common.runAuton();
+                common.runAprilTags();
+                common.correctPose(follower);
                 sendTelemetry();
             }
         }
@@ -222,6 +224,7 @@ public class BlueGate9 extends LinearOpMode {
         RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
         common = new RobotCommon();
         common.initialize(hardwareMap);
+        common.initAprilTag(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(startingPose);
         follower.update();

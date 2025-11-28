@@ -32,7 +32,7 @@ public class DriverControlAssist extends LinearOpMode {
     protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
     protected Pose midShotPose = new Pose(0,0,Math.toRadians(45));
     protected Pose closeShotPose = new Pose(42, -4, Math.toRadians(75));
-    protected Pose parkingPose = new Pose(-39, -33, Math.toRadians(0));
+    protected Pose parkingPose = new Pose(-35.5, -35, Math.toRadians(180));
 
     @Override
     public void runOpMode() {

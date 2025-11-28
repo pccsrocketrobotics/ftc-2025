@@ -90,7 +90,7 @@ public class RobotCommon {
         0.25, 7.5, 12, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
         0, -90 + 18, 0, 0);
-    public static double POSITION_FILTER = 0.9;
+    public static double POSITION_FILTER = 0.03;
     private final LowPassFilter xFilter = new LowPassFilter(POSITION_FILTER);
     private final LowPassFilter yFilter = new LowPassFilter(POSITION_FILTER);
     private final LowPassFilter headingFilter = new LowPassFilter(POSITION_FILTER);
@@ -276,19 +276,11 @@ public class RobotCommon {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
-
-            // The following default settings are available to un-comment and edit as needed.
             .setDrawTagOutline(true)
             .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
             .setCameraPose(cameraPosition, cameraOrientation)
-
             // == CAMERA CALIBRATION ==
-            // If you do not manually specify calibration parameters, the SDK will attempt
-            // to load a predefined calibration for your camera.
             .setLensIntrinsics(935.184, 935.184, 316.249, 254.729)
-
-            // ... these parameters are fx, fy, cx, cy.
-
             .build();
 
         // Create the vision portal by using a builder.
@@ -296,19 +288,18 @@ public class RobotCommon {
 
         builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
 
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
-
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        builder.enableLiveView(true);
-
+        // builder.enableLiveView(true);
 
         // Set and enable the processor.
         builder.addProcessor(aprilTag);
 
         // Build the Vision Portal, using the above settings.
         builder.build();
+
+        xFilter.update(0, 0);
+        yFilter.update(0, 0);
+        headingFilter.update(0, 0);
     }
 
     public void runAprilTags() {
@@ -332,7 +323,7 @@ public class RobotCommon {
          PoseTracker poseTracker = follower.getPoseTracker();
          Pose rawPose = poseTracker.getRawPose();
          double xOffset = poseFromCamera.getX() - rawPose.getX();
-         double yOffset =  - poseFromCamera.getY() - rawPose.getY();
+         double yOffset = poseFromCamera.getY() - rawPose.getY();
          double headingOffset = MathFunctions.getSmallestAngleDifference(poseFromCamera.getHeading(), rawPose.getHeading());
 
          xFilter.update(xOffset,0);
@@ -348,16 +339,13 @@ public class RobotCommon {
     @SuppressLint("DefaultLocale")
     public void sendTelemetry(Telemetry telemetry) {
         //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("vx", vx);
-        telemetry.addData("vy", vy);
-        telemetry.addData("rot", rot);
         telemetry.addData("shooterTarget", shooterTarget);
         telemetry.addData("shooter", shooter.getVelocity());
         telemetry.addData("shooterPower", shooterPower);
-        telemetry.addData("frontLeft", String.format("%d / %d", (int) frontLeft.getVelocity(), (int) frontLeftTarget));
-        telemetry.addData("backLeft", String.format("%d / %d", (int) frontRight.getVelocity(), (int) frontRightTarget));
-        telemetry.addData("frontRight", String.format("%d / %d", (int) backLeft.getVelocity(), (int) backLeftTarget));
-        telemetry.addData("backRight", String.format("%d / %d", (int) backRight.getVelocity(), (int) backRightTarget));
+        telemetry.addData("frontLeft", frontLeft.getVelocity());
+        telemetry.addData("backLeft", frontRight.getVelocity());
+        telemetry.addData("frontRight", backLeft.getVelocity());
+        telemetry.addData("backRight", backRight.getVelocity());
         telemetry.addData("leftLift", leftLift.getCurrentPosition());
         telemetry.addData("rightLift", rightLift.getCurrentPosition());
         telemetry.addData("liftTargetPosition", liftTargetPosition);
@@ -391,11 +379,11 @@ public class RobotCommon {
         telemetry.addData("xCam", poseFromCamera != null ? poseFromCamera.getX() : 0);
         telemetry.addData("yCam", poseFromCamera != null ? poseFromCamera.getY() : 0);
         telemetry.addData("headingCam", poseFromCamera != null ? Math.toDegrees(poseFromCamera.getHeading()) : 0);
-        dashboardTelemetry.addData("xOffset", xFilter.getState());
-        dashboardTelemetry.addData("yOffset", yFilter.getState());
-        dashboardTelemetry.addData("headingOffset", headingFilter.getState());
-
+        telemetry.addData("xOffset", xFilter.getState());
+        telemetry.addData("yOffset", yFilter.getState());
+        telemetry.addData("headingOffset", Math.toDegrees(headingFilter.getState()));
     }
+
     public static Pose mirror(Pose p) {
         return new Pose(p.getX(), -p.getY(), -p.getHeading());
     }
