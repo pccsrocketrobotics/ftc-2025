@@ -3,10 +3,12 @@ package org.firstinspires.ftc.teamcode;
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.pedropathing.control.LowPassFilter;
 import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.localization.PoseTracker;
 import com.pedropathing.math.MathFunctions;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -88,6 +90,10 @@ public class RobotCommon {
         0.25, 7.5, 12, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES,
         0, -90 + 18, 0, 0);
+    public static double POSITION_FILTER = 0.9;
+    private final LowPassFilter xFilter = new LowPassFilter(POSITION_FILTER);
+    private final LowPassFilter yFilter = new LowPassFilter(POSITION_FILTER);
+    private final LowPassFilter headingFilter = new LowPassFilter(POSITION_FILTER);
 
     public void initialize(HardwareMap hardwareMap) {
         agitator = hardwareMap.get(CRServo.class, "agitator");
@@ -321,6 +327,24 @@ public class RobotCommon {
         }
     }
 
+    public void correctPose(Follower follower) {
+     if(poseFromCamera != null) {
+         PoseTracker poseTracker = follower.getPoseTracker();
+         Pose rawPose = poseTracker.getRawPose();
+         double xOffset = poseFromCamera.getX() - rawPose.getX();
+         double yOffset =  - poseFromCamera.getY() - rawPose.getY();
+         double headingOffset = MathFunctions.getSmallestAngleDifference(poseFromCamera.getHeading(), rawPose.getHeading());
+
+         xFilter.update(xOffset,0);
+         yFilter.update(yOffset,0);
+         headingFilter.update(headingOffset,0);
+
+         poseTracker.setXOffset(xFilter.getState());
+         poseTracker.setYOffset(yFilter.getState());
+         poseTracker.setHeadingOffset(headingFilter.getState());
+     }
+    }
+
     @SuppressLint("DefaultLocale")
     public void sendTelemetry(Telemetry telemetry) {
         //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
@@ -367,6 +391,10 @@ public class RobotCommon {
         telemetry.addData("xCam", poseFromCamera != null ? poseFromCamera.getX() : 0);
         telemetry.addData("yCam", poseFromCamera != null ? poseFromCamera.getY() : 0);
         telemetry.addData("headingCam", poseFromCamera != null ? Math.toDegrees(poseFromCamera.getHeading()) : 0);
+        dashboardTelemetry.addData("xOffset", xFilter.getState());
+        dashboardTelemetry.addData("yOffset", yFilter.getState());
+        dashboardTelemetry.addData("headingOffset", headingFilter.getState());
+
     }
     public static Pose mirror(Pose p) {
         return new Pose(p.getX(), -p.getY(), -p.getHeading());

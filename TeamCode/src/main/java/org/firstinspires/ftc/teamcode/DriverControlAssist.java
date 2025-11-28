@@ -45,6 +45,7 @@ public class DriverControlAssist extends LinearOpMode {
                 follower.update();
                 common.runAuton();
                 common.runAprilTags();
+                common.correctPose(follower);
                 sendTelemetry();
             }
         }
