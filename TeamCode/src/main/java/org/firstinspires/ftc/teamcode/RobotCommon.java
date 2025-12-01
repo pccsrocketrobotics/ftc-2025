@@ -10,6 +10,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.localization.PoseTracker;
 import com.pedropathing.math.MathFunctions;
+import com.pedropathing.paths.HeadingInterpolator;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -338,7 +339,6 @@ public class RobotCommon {
 
     @SuppressLint("DefaultLocale")
     public void sendTelemetry(Telemetry telemetry) {
-        //telemetry.addData("Heading", odo.getHeading(AngleUnit.DEGREES));
         telemetry.addData("shooterTarget", shooterTarget);
         telemetry.addData("shooter", shooter.getVelocity());
         telemetry.addData("shooterPower", shooterPower);
@@ -386,5 +386,12 @@ public class RobotCommon {
 
     public static Pose mirror(Pose p) {
         return new Pose(p.getX(), -p.getY(), -p.getHeading());
+    }
+
+    public static HeadingInterpolator facingPoint(double x, double y) {
+        return closestPoint -> MathFunctions.normalizeAngle(Math.atan2(
+            y - closestPoint.pose.getY(),
+            x - closestPoint.pose.getX()
+        ));
     }
 }

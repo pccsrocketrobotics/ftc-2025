@@ -169,6 +169,7 @@ public class DriverControlAssist extends LinearOpMode {
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(follower.getPose(), target))
                 .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                .setTimeoutConstraint(1500)
                 .build();
         follower.followPath(path);
     }

@@ -24,14 +24,16 @@ public class BluePickle extends LinearOpMode{
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
     protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    protected Pose loadingPose1 = new Pose(-62,62,Math.toRadians(180));
-    protected Pose loadingPose2 = new Pose(-62,62,Math.toRadians(172));
+    protected Pose loadingPose1 = new Pose(-58,64,Math.toRadians(170));
+    protected Pose loadingPose2 = new Pose(-58,62,Math.toRadians(170));
+    protected Pose loadingFace = new Pose(-72, 64, Math.toRadians(0));
     protected Pose endPose = new Pose(-60,46,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1560;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 200;
     public static double START_DELAY = 1500;
-    public static double PICKUP_TIME = 2000;
+    public static double PICKUP_TIME1 = 4000;
+    public static double PICKUP_TIME2 = 3000;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();
@@ -47,36 +49,49 @@ public class BluePickle extends LinearOpMode{
         PathChain loadingZonePath = follower.pathBuilder()
                 .addPath(new BezierCurve(
                     farShotPose,
-                    new Pose(-41, 22),
-                    new Pose(-46, 67),
+                    // TODO: make these into poses that are mirrored in RedPickle!
+                    new Pose(-44, 17),
+                    new Pose(-40, 61),
                     loadingPose1
                 ))
+                .setHeadingInterpolation(RobotCommon.facingPoint(loadingFace.getX(), loadingFace.getY()))
+//                .setHeadingInterpolation(HeadingInterpolator.piecewise(
+//                    new HeadingInterpolator.PiecewiseNode(0, 0.5, HeadingInterpolator.tangent),
+//                    new HeadingInterpolator.PiecewiseNode(0.5, 1.0, HeadingInterpolator.constant(loadingPose1.getHeading()))
+//                ))
                 .build();
         PathChain shootingPath2 = follower.pathBuilder()
-                .addPath(new BezierLine(loadingPose1, farShotPose))
-                .setLinearHeadingInterpolation(loadingPose1.getHeading(), farShotPose.getHeading())
+                .addPath(new BezierCurve(
+                    loadingPose1,
+                    new Pose(-47, 50),
+                    farShotPose
+                ))
+                .setConstantHeadingInterpolation(farShotPose.getHeading())
                 .build();
         PathChain loadingZonePath2 = follower.pathBuilder()
                 .addPath(new BezierCurve(
                     farShotPose,
-                new Pose(-46,49),
-                new Pose (-43,59),
+                    new Pose(-44,17),
+                    new Pose (-40,61),
                     loadingPose2
                 ))
+                .setHeadingInterpolation(RobotCommon.facingPoint(loadingFace.getX(), loadingFace.getY()))
                 .build();
         PathChain shootingPath3 = follower.pathBuilder()
-                .addPath(new BezierLine(loadingPose2, farShotPose))
-                .setLinearHeadingInterpolation(loadingPose2.getHeading(), farShotPose.getHeading())
+                .addPath(new BezierCurve(
+                    loadingPose2,
+                    new Pose(-57, 50),
+                    farShotPose
+                ))
+            .setConstantHeadingInterpolation(farShotPose.getHeading())
                 .build();
         PathChain endPath = follower.pathBuilder()
-            .addPath(new BezierLine(farShotPose, endPose))
-            .setLinearHeadingInterpolation(farShotPose.getHeading(), endPose.getHeading())
-            .build();
-
+                .addPath(new BezierLine(farShotPose, endPose))
+                .setConstantHeadingInterpolation(endPose.getHeading())
+                .build();
 
         waitForStart();
         if (opModeIsActive()) {
-
             while (opModeIsActive()) {
                 switch (state) {
                     case 0:
@@ -86,7 +101,7 @@ public class BluePickle extends LinearOpMode{
                         changeState(1);
                         break;
                     case 1:
-                        if(!follower.isBusy() && stateTime.milliseconds() > START_DELAY){
+                        if (!follower.isBusy() && stateTime.milliseconds() > START_DELAY) {
                             changeState(2);
                         }
                         break;
@@ -115,7 +130,7 @@ public class BluePickle extends LinearOpMode{
                         changeState(6);
                         break;
                     case 6:
-                        if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME) {
+                        if (stateTime.milliseconds() > PICKUP_TIME1) {
                             changeState(9);
                         }
                         break;
@@ -154,7 +169,7 @@ public class BluePickle extends LinearOpMode{
                         changeState(15);
                         break;
                     case 15:
-                        if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME) {
+                        if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME2) {
                             changeState(18);
                         }
                         break;
@@ -192,7 +207,12 @@ public class BluePickle extends LinearOpMode{
                         common.setShooterTarget(0);
                         follower.followPath(endPath);
                         changeState(24);
-                        common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+                        break;
+                    case 24:
+                        if (!follower.isBusy()) {
+                            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+                            changeState(25);
+                        }
                         break;
                 }
 
