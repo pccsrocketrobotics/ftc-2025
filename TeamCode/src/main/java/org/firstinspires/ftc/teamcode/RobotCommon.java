@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.eventloop.opmode.OpMode.blackboard;
+
 import android.annotation.SuppressLint;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -298,9 +300,12 @@ public class RobotCommon {
         // Build the Vision Portal, using the above settings.
         builder.build();
 
-        xFilter.update(0, 0);
-        yFilter.update(0, 0);
-        headingFilter.update(0, 0);
+        Object xInit = blackboard.get("xFilter");
+        Object yInit = blackboard.get("yFilter");
+        Object headingInit = blackboard.get("headingFilter");
+        xFilter.update(xInit instanceof Number ? ((Number) xInit).doubleValue() : 0.0, 0);
+        yFilter.update(yInit instanceof Number ? ((Number) yInit).doubleValue() : 0.0, 0);
+        headingFilter.update(headingInit instanceof Number ? ((Number) headingInit).doubleValue() : 0.0, 0);
     }
 
     public void runAprilTags() {
@@ -334,6 +339,10 @@ public class RobotCommon {
          poseTracker.setXOffset(xFilter.getState());
          poseTracker.setYOffset(yFilter.getState());
          poseTracker.setHeadingOffset(headingFilter.getState());
+
+         blackboard.put("xFilter", xFilter.getState());
+         blackboard.put("yFilter", yFilter.getState());
+         blackboard.put("headingFilter", headingFilter.getState());
      }
     }
 

@@ -83,7 +83,7 @@ public class BluePickle extends LinearOpMode{
                     new Pose(-57, 50),
                     farShotPose
                 ))
-            .setConstantHeadingInterpolation(farShotPose.getHeading())
+                .setConstantHeadingInterpolation(farShotPose.getHeading())
                 .build();
         PathChain endPath = follower.pathBuilder()
                 .addPath(new BezierLine(farShotPose, endPose))
