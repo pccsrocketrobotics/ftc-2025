@@ -325,8 +325,8 @@ public class RobotCommon {
     }
 
     public void correctPose(Follower follower) {
-     if(poseFromCamera != null) {
-         PoseTracker poseTracker = follower.getPoseTracker();
+        if(poseFromCamera != null) {
+          PoseTracker poseTracker = follower.getPoseTracker();
          Pose rawPose = poseTracker.getRawPose();
          double xOffset = poseFromCamera.getX() - rawPose.getX();
          double yOffset = poseFromCamera.getY() - rawPose.getY();

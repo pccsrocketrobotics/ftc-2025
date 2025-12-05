@@ -130,7 +130,7 @@ public class DriverControlAssist extends LinearOpMode {
             if (follower.isTeleopDrive()) {
                 goToPose(farShotPose);
             }
-        } else if (gamepad1.right_bumper) {
+        } else if (gamepad1.right_bumper || gamepad1.left_bumper) {
             if (follower.isTeleopDrive()) {
                 goToPose(closeShotPose);
             }

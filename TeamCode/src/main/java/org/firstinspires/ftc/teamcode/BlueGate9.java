@@ -23,8 +23,8 @@ public class BlueGate9 extends LinearOpMode {
     private RobotCommon common;
     protected Pose startingPose = new Pose(48.1,50.5,Math.toRadians(0));
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
-    protected Pose alignPose1 = new Pose(12.7,26.8,Math.toRadians(90));
-    protected Pose pickupPose1 = new Pose(12.7,50,Math.toRadians(90));
+    protected Pose alignPose1 = new Pose(11.7,26.8,Math.toRadians(90));
+    protected Pose pickupPose1 = new Pose(11.7,50,Math.toRadians(90));
     protected Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
     protected Pose pickupPose2 = new Pose(-12.7,50,Math.toRadians(90));
     protected Pose halfShotPose2 = new Pose(34,20.5,Math.toRadians(54));
