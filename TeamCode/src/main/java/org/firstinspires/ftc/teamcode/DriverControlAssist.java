@@ -25,7 +25,7 @@ public class DriverControlAssist extends LinearOpMode {
     public static int LIFT_MAX = 2800;
     public static double SHOOTER_X = 1350;
     public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_START = 1550;
+    public static double SHOOTER_BACK = 1575;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
@@ -103,7 +103,7 @@ public class DriverControlAssist extends LinearOpMode {
         } else if (gamepad2.x) {
             common.setShooterTarget(SHOOTER_X);
         } else if (gamepad2.back) {
-            common.setShooterTarget(SHOOTER_START);
+            common.setShooterTarget(SHOOTER_BACK);
         } else if (gamepad2.guide) {
             common.setShooterTarget(0);
         }

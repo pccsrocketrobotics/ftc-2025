@@ -20,7 +20,7 @@ public class DriverControl extends LinearOpMode {
     public static int LIFT_UP = 1;
     public static double SHOOTER_X = 1325;
     public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_START = 1600;
+    public static double SHOOTER_BACK = 1575;
     private int headingOffset = 0;
     
     @Override
@@ -65,7 +65,7 @@ public class DriverControl extends LinearOpMode {
         } else if (gamepad2.x) {
             common.setShooterTarget(SHOOTER_X);
         } else if (gamepad2.back) {
-            common.setShooterTarget(SHOOTER_START);
+            common.setShooterTarget(SHOOTER_BACK);
         } else if (gamepad2.guide) {
             common.setShooterTarget(0);
         }

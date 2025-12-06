@@ -24,7 +24,7 @@ public class BlueWallFar extends LinearOpMode{
     protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
     protected Pose alignPose3 = new Pose(-34,26.3,Math.toRadians(90));
     protected Pose pickupPose3 = new Pose(-34,50,Math.toRadians(90));
-    public static double SHOOTER_AUTON = 1575;
+    public static double SHOOTER_AUTON = 1540;
     public static double FEEDER_TIME = 1000;
     public static double SHOOTING_TIME = 500;
     public static double START_DELAY = 3000;
