@@ -325,6 +325,7 @@ public class RobotCommon {
     }
 
     public void correctPose(Follower follower) {
+        /*
         if(poseFromCamera != null) {
           PoseTracker poseTracker = follower.getPoseTracker();
          Pose rawPose = poseTracker.getRawPose();
@@ -344,7 +345,9 @@ public class RobotCommon {
          blackboard.put("yFilter", yFilter.getState());
          blackboard.put("headingFilter", headingFilter.getState());
      }
+         */
     }
+
 
     @SuppressLint("DefaultLocale")
     public void sendTelemetry(Telemetry telemetry) {

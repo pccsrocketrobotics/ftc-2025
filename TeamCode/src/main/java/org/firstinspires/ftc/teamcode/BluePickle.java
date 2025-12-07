@@ -24,11 +24,11 @@ public class BluePickle extends LinearOpMode{
     private RobotCommon common;
     protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
     protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    protected Pose loadingPose1 = new Pose(-58,64,Math.toRadians(170));
+    protected Pose loadingPose1 = new Pose(-58,66,Math.toRadians(170));
     protected Pose loadingPose2 = new Pose(-58,62,Math.toRadians(170));
     protected Pose loadingFace = new Pose(-72, 64, Math.toRadians(0));
-    protected Pose loadingControl1Pose = new Pose(-54, 17);
-    protected Pose loadingControl2Pose =  new Pose(-40, 61);
+    protected Pose loadingControl1Pose = new Pose(-48, 17);
+    protected Pose loadingControl2Pose =  new Pose(-40, 64);
     protected Pose shotControlPose = new Pose(-52, 50);
     protected Pose endPose = new Pose(-60,60,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1540;

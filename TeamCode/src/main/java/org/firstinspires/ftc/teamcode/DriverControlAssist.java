@@ -23,9 +23,9 @@ public class DriverControlAssist extends LinearOpMode {
     public static double ROT_FAST = 0.5;
     public static double ROT_SLOW = 0.3;
     public static int LIFT_MAX = 2800;
-    public static double SHOOTER_X = 1350;
+    public static double SHOOTER_X = 1375;
     public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_BACK = 1575;
+    public static double SHOOTER_BACK = 1540;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
     protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));

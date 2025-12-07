@@ -58,6 +58,7 @@ public class Constants {
             0.8
     );
     public static Follower createFollower(HardwareMap hardwareMap) {
+        pathConstraints.setTimeoutConstraint(100);
         return new FollowerBuilder(followerConstants, hardwareMap)
                 .mecanumDrivetrain(driveConstants)
                 .pinpointLocalizer(localizerConstants)
