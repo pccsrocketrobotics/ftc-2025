@@ -118,6 +118,11 @@ public class DriverControlAssist extends LinearOpMode {
             common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
         }
 
+        if (gamepad1.dpadLeftWasPressed()) {
+            farShotPose = farShotPose.setHeading(farShotPose.getHeading() + Math.toRadians(1));
+        } else if (gamepad1.dpadRightWasPressed()) {
+            farShotPose = farShotPose.setHeading(farShotPose.getHeading() - Math.toRadians(1));
+        }
         if (gamepad1.x) {
             if (follower.isTeleopDrive()) {
                 goToPose(halfShotPose);
