@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static com.qualcomm.robotcore.eventloop.opmode.OpMode.blackboard;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.control.LowPassFilter;
@@ -10,7 +11,6 @@ import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.control.PIDFController;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.localization.PoseTracker;
 import com.pedropathing.math.MathFunctions;
 import com.pedropathing.paths.HeadingInterpolator;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -18,8 +18,11 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LED;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -73,6 +76,9 @@ public class RobotCommon {
     private LED blueLed;
     private LED yellowLed;
     private LED greenLed;
+    private NormalizedColorSensor colorSensor;
+    private double ballDistance;
+    public static float COLOR_GAIN = 2;
     private final ElapsedTime ledTimer = new ElapsedTime();
     public GoBildaPinpointDriver odo;
     private AprilTagProcessor aprilTag;
@@ -114,6 +120,7 @@ public class RobotCommon {
         blueLed = hardwareMap.get(LED.class, "blueLed");
         yellowLed = hardwareMap.get(LED.class, "yellowLed");
         greenLed = hardwareMap.get(LED.class, "greenLed");
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color");
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -134,6 +141,8 @@ public class RobotCommon {
         yellowLed.off();
         greenLed.off();
         blueLed.off();
+
+        colorSensor.setGain(COLOR_GAIN);
     }
 
     public void run() {
@@ -142,6 +151,7 @@ public class RobotCommon {
         runLift();
         runShooter();
         runFeeder();
+        runColor();
         runLeds();
     }
     public void runAuton() {
@@ -149,6 +159,7 @@ public class RobotCommon {
         runLift();
         runShooter();
         runFeeder();
+        runColor();
         runLeds();
     }
 
@@ -231,10 +242,14 @@ public class RobotCommon {
             leftFeeder.setPower(0);
         }
     }
+    private void runColor() {
+        ballDistance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+    }
     private void runLeds() {
         boolean red = false;
         boolean blue = false;
         boolean yellow = false;
+        boolean green = false;
         if (shooter.getVelocity() < 100 && shooterTarget == 0) {
             ledTimer.reset();
             red = true;
@@ -248,11 +263,12 @@ public class RobotCommon {
             ledTimer.reset();
             yellow = true;
         }
+        green = ballDistance < 8;
+
         redLed.enable(red);
         blueLed.enable(blue);
         yellowLed.enable(yellow);
-
-        greenLed.enable(poseFromCamera != null);
+        greenLed.enable(green);
     }
     //Setters
     public void setLiftTargetPosition(int liftTargetPosition) {
@@ -363,9 +379,10 @@ public class RobotCommon {
         telemetry.addData("liftTargetPosition", liftTargetPosition);
         telemetry.addData("feeder",feederDirection);
         telemetry.addData("intake",intakeDirection);
+        telemetry.addData("ball distance", ballDistance);
         telemetry.update();
     }
-    
+
     public void addPedroPathingTelemetry(Telemetry telemetry, Telemetry dashboardTelemetry, Follower follower) {
         boolean hasPath = follower.getCurrentPath() != null;
         telemetry.addData("x", follower.getPose().getX());
