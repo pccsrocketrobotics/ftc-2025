@@ -18,6 +18,13 @@ public class DriverControlAssist extends LinearOpMode {
     private RobotCommon common;
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+    private enum AssistPose {
+        POSE_X,
+        POSE_Y,
+        POSE_BACK,
+        POSE_TRIGGER
+    }
+    private AssistPose lastAssist = AssistPose.POSE_BACK;
     public static double ROBOT_SLOW = 0.5;
     public static double ROBOT_FAST = 1;
     public static double ROT_FAST = 0.5;
@@ -119,23 +126,27 @@ public class DriverControlAssist extends LinearOpMode {
         }
 
         if (gamepad1.dpadLeftWasPressed()) {
-            farShotPose = farShotPose.setHeading(farShotPose.getHeading() + Math.toRadians(1));
+            updatePose(1);
         } else if (gamepad1.dpadRightWasPressed()) {
-            farShotPose = farShotPose.setHeading(farShotPose.getHeading() - Math.toRadians(1));
+            updatePose(-1);
         }
         if (gamepad1.x) {
+            lastAssist = AssistPose.POSE_X;
             if (follower.isTeleopDrive()) {
                 goToPose(halfShotPose);
             }
         } else if (gamepad1.y) {
+            lastAssist = AssistPose.POSE_Y;
             if (follower.isTeleopDrive()) {
                 goToPose(midShotPose);
             }
         } else if (gamepad1.back) {
+            lastAssist = AssistPose.POSE_BACK;
             if (follower.isTeleopDrive()) {
                 goToPose(farShotPose);
             }
         } else if (gamepad1.right_bumper || gamepad1.left_bumper) {
+            lastAssist = AssistPose.POSE_TRIGGER;
             if (follower.isTeleopDrive()) {
                 goToPose(closeShotPose);
             }
@@ -165,6 +176,23 @@ public class DriverControlAssist extends LinearOpMode {
 
         follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
 
+    }
+
+    private void updatePose(int delta) {
+        switch (lastAssist) {
+            case POSE_X:
+                halfShotPose = halfShotPose.setHeading(halfShotPose.getHeading() + Math.toRadians(delta));
+                break;
+            case POSE_Y:
+                midShotPose = midShotPose.setHeading(midShotPose.getHeading() + Math.toRadians(delta));
+                break;
+            case POSE_BACK:
+                farShotPose = farShotPose.setHeading(farShotPose.getHeading() + Math.toRadians(delta));
+                break;
+            case POSE_TRIGGER:
+                closeShotPose = closeShotPose.setHeading(closeShotPose.getHeading() + Math.toRadians(delta));
+                break;
+        }
     }
 
     private void goToPose(Pose target) {
