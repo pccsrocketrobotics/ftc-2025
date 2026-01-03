@@ -125,9 +125,9 @@ public class DriverControlAssist extends LinearOpMode {
             common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
         }
 
-        if (gamepad1.dpadLeftWasPressed()) {
+        if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()) {
             updatePose(1);
-        } else if (gamepad1.dpadRightWasPressed()) {
+        } else if (gamepad1.dpadRightWasPressed() || gamepad2.dpadRightWasPressed()) {
             updatePose(-1);
         }
         if (gamepad1.x) {
@@ -201,7 +201,7 @@ public class DriverControlAssist extends LinearOpMode {
         }
         PathChain path = follower.pathBuilder()
                 .addPath(new BezierLine(follower.getPose(), target))
-                .setLinearHeadingInterpolation(follower.getHeading(), target.getHeading())
+                .setConstantHeadingInterpolation(target.getHeading())
                 .setTimeoutConstraint(1500)
                 .build();
         follower.followPath(path);
