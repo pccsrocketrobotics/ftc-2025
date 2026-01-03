@@ -25,8 +25,8 @@ public class BlueWallMid extends LinearOpMode{
     protected Pose alignPose2 = new Pose(-13.6,26.3,Math.toRadians(90));
     protected Pose pickupPose2 = new Pose(-12.7,50,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1350;
-    public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 500;
+    public static double FEEDER_TIME = 700;
+    public static double SHOOTING_TIME = 400;
     private int shots = 0;
     private int state = 0;
     private final ElapsedTime stateTime = new ElapsedTime();

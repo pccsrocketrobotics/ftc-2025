@@ -35,8 +35,8 @@ public class BluePickle extends LinearOpMode{
     protected Pose shotControlPose = new Pose(-52, 50);
     protected Pose endPose = new Pose(-60,60,Math.toRadians(90));
     public static double SHOOTER_AUTON = 1540;
-    public static double FEEDER_TIME = 1000;
-    public static double SHOOTING_TIME = 200;
+    public static double FEEDER_TIME = 700;
+    public static double SHOOTING_TIME = 400;
     public static double START_DELAY = 1500;
     public static double PICKUP_TIME1 = 2000;
     public static double PICKUP_TIME2 = 2000;
