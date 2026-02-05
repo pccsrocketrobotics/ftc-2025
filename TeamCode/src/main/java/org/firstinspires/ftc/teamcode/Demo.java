@@ -71,10 +71,7 @@ public class Demo extends LinearOpMode {
             common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
         } else if (gamepad1.b) {
             common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
-        } else {
-            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
-        }
-        if (gamepad1.right_bumper) {
+        } else if (gamepad1.right_bumper) {
             common.setFeederDirection(RobotCommon.ShaftDirection.IN);
             common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
             common.setShooterTarget(FULL_SHOOTING);
