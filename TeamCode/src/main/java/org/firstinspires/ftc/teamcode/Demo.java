@@ -8,6 +8,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -21,8 +22,9 @@ public class Demo extends LinearOpMode {
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     public static double ROBOT_SLOW = 0.5;
     public static double ROT_SLOW = 0.3;
-    public static double FULL_SHOOTING = 900;
-    public static double FULL_BOWLING = -900;
+    public static double FULL_SHOOTING = 1000;
+    public static double FULL_BOWLING = -1000;
+    private ElapsedTime shootingWait = new ElapsedTime();
     private int headingOffset = 0;
     @Override
     public void runOpMode() {
@@ -69,12 +71,14 @@ public class Demo extends LinearOpMode {
     private void controls() {
         if (gamepad1.a) {
             common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
-        } else if (gamepad1.b) {
+        } else if (gamepad1.x) {
             common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
-        } else if (gamepad1.right_bumper) {
-            common.setFeederDirection(RobotCommon.ShaftDirection.IN);
-            common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
+        } else if (gamepad1.b) {
             common.setShooterTarget(FULL_SHOOTING);
+            common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
+            if (shootingWait.milliseconds() >= 750) {
+                common.setFeederDirection(RobotCommon.ShaftDirection.IN);
+            }
         } else if (gamepad1.left_bumper) {
             common.setFeederDirection(RobotCommon.ShaftDirection.OUT);
             common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
@@ -83,6 +87,9 @@ public class Demo extends LinearOpMode {
             common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
             common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
             common.setShooterTarget(0);
+        }
+        if (!gamepad1.b) {
+            shootingWait.reset();
         }
         double speed = ROBOT_SLOW;
         double rotSpeed = ROT_SLOW;
@@ -93,6 +100,11 @@ public class Demo extends LinearOpMode {
             blackboard.put("headingOffset", headingOffset);
         }
         double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
+        if (gamepad1.dpad_right) {
+            rot = rotSpeed;
+        } else if (gamepad1.dpad_left) {
+            rot = -rotSpeed;
+        }
 
         follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
 
