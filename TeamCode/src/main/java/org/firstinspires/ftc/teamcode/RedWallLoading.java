@@ -8,19 +8,20 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class RedWallLoading extends BlueWallLoading {
 
     @Override
-    public void runOpMode() {
-        startingPose = RobotCommon.mirror(startingPose);
-        farShotPose = RobotCommon.mirror(farShotPose);
-        alignPose3 = RobotCommon.mirror(alignPose3);
-        pickupPose3 = RobotCommon.mirror(pickupPose3);
-        alignPose2 = RobotCommon.mirror(alignPose2);
-        pickupPose2 = RobotCommon.mirror(pickupPose2);
-        endPose = RobotCommon.mirror(endPose);
-        slamBackPose = RobotCommon.mirror(slamBackPose);
-        slamPose1 = RobotCommon.mirror(slamPose1);
-        slamPose2 = RobotCommon.mirror(slamPose2);
-        super.runOpMode();
+    public void initialize() {
+        startingPose = PoseUtil.mirror(startingPose);
+        farShotPose = PoseUtil.mirror(farShotPose);
+        alignPose3 = PoseUtil.mirror(alignPose3);
+        pickupPose3 = PoseUtil.mirror(pickupPose3);
+        alignPose2 = PoseUtil.mirror(alignPose2);
+        pickupPose2 = PoseUtil.mirror(pickupPose2);
+        endPose = PoseUtil.mirror(endPose);
+        slamBackPose = PoseUtil.mirror(slamBackPose);
+        slamPose1 = PoseUtil.mirror(slamPose1);
+        slamPose2 = PoseUtil.mirror(slamPose2);
+        super.initialize();
     }
+
     @Override
     protected void setBlackboard() {
         blackboard.put("headingOffset", -90);

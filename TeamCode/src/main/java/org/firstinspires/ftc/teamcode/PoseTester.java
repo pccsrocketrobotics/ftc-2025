@@ -8,7 +8,6 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
@@ -18,16 +17,19 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 public class PoseTester extends LinearOpMode {
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private Follower follower;
-    public static Pose startingPose = new Pose(0,0,Math.toRadians(0));
-    private RobotCommon common;
+    public static Pose startingPose = new Pose(0, 0, Math.toRadians(0));
 
     @Override
     public void runOpMode() {
-        initialize();
+        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
+        RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose);
+        follower.update();
+        sendTelemetry();
 
         waitForStart();
         if (opModeIsActive()) {
-
             while (opModeIsActive()) {
                 follower.update();
                 sendTelemetry();
@@ -35,20 +37,11 @@ public class PoseTester extends LinearOpMode {
         }
     }
 
-    private void initialize() {
-        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
-        RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
-        common = new RobotCommon();
-        common.initialize(hardwareMap);
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose);
-        follower.update();
-        sendTelemetry();
-    }
-
     private void sendTelemetry() {
-        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
         RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
-        common.sendTelemetry(telemetry);
+        telemetry.update();
     }
 }

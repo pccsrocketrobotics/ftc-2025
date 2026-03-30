@@ -8,13 +8,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class RedWallFar extends BlueWallFar {
 
     @Override
-    public void runOpMode() {
-        startingPose = RobotCommon.mirror(startingPose);
-        farShotPose = RobotCommon.mirror(farShotPose);
-        alignPose3 = RobotCommon.mirror(alignPose3);
-        pickupPose3 = RobotCommon.mirror(pickupPose3);
-        super.runOpMode();
+    public void initialize() {
+        startingPose = PoseUtil.mirror(startingPose);
+        farShotPose = PoseUtil.mirror(farShotPose);
+        alignPose3 = PoseUtil.mirror(alignPose3);
+        pickupPose3 = PoseUtil.mirror(pickupPose3);
+        super.initialize();
     }
+
     @Override
     protected void setBlackboard() {
         blackboard.put("headingOffset", -90);

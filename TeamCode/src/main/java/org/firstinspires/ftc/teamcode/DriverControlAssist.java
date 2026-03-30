@@ -3,21 +3,33 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
+import org.firstinspires.ftc.teamcode.subsystems.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.Feeder;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LEDs;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 @TeleOp
 @Config
-public class DriverControlAssist extends LinearOpMode {
-    private RobotCommon common;
-    private Follower follower;
+public class DriverControlAssist extends CommandOpMode {
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+    private Drive drive;
+    private Shooter shooter;
+    private Intake intake;
+    private Feeder feeder;
+    private Lift lift;
+    private ColorSensor colorSensor;
+    private Follower follower;
+
     private enum AssistPose {
         POSE_X,
         POSE_Y,
@@ -29,107 +41,124 @@ public class DriverControlAssist extends LinearOpMode {
     public static double ROBOT_FAST = 1;
     public static double ROT_FAST = 0.5;
     public static double ROT_SLOW = 0.3;
-    public static int LIFT_MAX = 2800;
     public static double SHOOTER_X = 1375;
     public static double SHOOTER_Y = 1400;
     public static double SHOOTER_BACK = 1540;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
-    protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
-    protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
-    protected Pose midShotPose = new Pose(0,0,Math.toRadians(45));
+    protected Pose halfShotPose = new Pose(27.5, 27, Math.toRadians(45));
+    protected Pose farShotPose = new Pose(-54.5, 12.5, Math.toRadians(23.5));
+    protected Pose midShotPose = new Pose(0, 0, Math.toRadians(45));
     protected Pose closeShotPose = new Pose(42, -4, Math.toRadians(75));
     protected Pose parkingPose = new Pose(-35.5, -35, Math.toRadians(180));
 
     @Override
-    public void runOpMode() {
-        initialize();
-
-        waitForStart();
-        if(opModeIsActive()) {
-            while (opModeIsActive()) {
-                controls();
-                follower.update();
-                common.runAuton();
-                common.runAprilTags();
-                common.correctPose(follower);
-                sendTelemetry();
-            }
-        }
-    }
-
-    private void initialize() {
+    public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
-        common = new RobotCommon();
-        common.initialize(hardwareMap);
-        common.initAprilTag(hardwareMap);
+
+        // Create follower from blackboard or fresh
         follower = (Follower) blackboard.get("follower");
         if (follower == null) {
             follower = Constants.createFollower(hardwareMap);
         }
         follower.update();
         follower.startTeleOpDrive(true);
+
         if (blackboard.containsKey("headingOffset")) {
-            headingOffset = (int)blackboard.get("headingOffset");
+            headingOffset = (int) blackboard.get("headingOffset");
         }
+
+        // Create subsystems
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
+        feeder = new Feeder(hardwareMap);
+        lift = new Lift(hardwareMap);
+        colorSensor = new ColorSensor(hardwareMap);
+        LEDs leds = new LEDs(hardwareMap, shooter, colorSensor);
+        drive = new Drive(follower);
+
+        register(drive, shooter, intake, feeder, lift, colorSensor, leds);
+
+        // Default command: teleop drive
+        drive.setDefaultCommand(drive.teleopDriveCommand(
+            () -> {
+                double speed = gamepad1.a ? ROBOT_SLOW : ROBOT_FAST;
+                return square(-gamepad1.left_stick_y) * speed;
+            },
+            () -> {
+                double speed = gamepad1.a ? ROBOT_SLOW : ROBOT_FAST;
+                return -square(gamepad1.left_stick_x) * speed;
+            },
+            () -> {
+                double rotSpeed = gamepad1.a ? ROT_SLOW : ROT_FAST;
+                return -square(gamepad1.right_trigger - gamepad1.left_trigger) * rotSpeed;
+            },
+            () -> Math.toRadians(headingOffset)
+        ));
+    }
+
+    @Override
+    public void run() {
+        controls();
+        super.run();
         sendTelemetry();
     }
 
-    private void sendTelemetry() {
-        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
-        RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
-        telemetry.addData("headingOffset", headingOffset);
-        telemetry.addData("isTeleopDrive", follower.isTeleopDrive());
-        common.sendTelemetry(telemetry);
-    }
-
     private void controls() {
+        // Intake
         if (gamepad2.a) {
-            common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
+            intake.inCommand().schedule();
         } else if (gamepad2.b) {
-            common.setIntakeDirection(RobotCommon.ShaftDirection.OUT);
+            intake.outCommand().schedule();
         } else {
-            common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
+            intake.stopCommand().schedule();
         }
+
+        // Lift
         if (gamepad1.dpad_up) {
-            int pos = common.getLiftTargetPosition() + LIFT_CHANGE;
-            if (pos > LIFT_MAX) {
-                pos = LIFT_MAX;
-            }
-            common.setLiftTargetPosition(pos);
+            lift.adjustCommand(LIFT_CHANGE).schedule();
         }
         if (gamepad1.dpad_down) {
-            int pos = common.getLiftTargetPosition() - LIFT_CHANGE;
-            if (pos < 0) {
-                pos = 0;
-            }
-            common.setLiftTargetPosition(pos);
+            lift.adjustCommand(-LIFT_CHANGE).schedule();
         }
+
+        // Shooter velocity presets
         if (gamepad2.y) {
-            common.setShooterTarget(SHOOTER_Y);
+            shooter.shootCommand(SHOOTER_Y).schedule();
         } else if (gamepad2.x) {
-            common.setShooterTarget(SHOOTER_X);
+            shooter.shootCommand(SHOOTER_X).schedule();
         } else if (gamepad2.back) {
-            common.setShooterTarget(SHOOTER_BACK);
+            shooter.shootCommand(SHOOTER_BACK).schedule();
         } else if (gamepad2.guide) {
-            common.setShooterTarget(0);
+            shooter.stopCommand().schedule();
         }
 
-        common.setJamFix(gamepad2.dpad_down);
-
-        if (gamepad2.right_bumper) {
-            common.setFeederDirection(RobotCommon.ShaftDirection.IN);
-        } else if (gamepad2.left_bumper) {
-            common.setFeederDirection(RobotCommon.ShaftDirection.OUT);
+        // Jam fix
+        if (gamepad2.dpad_down) {
+            shooter.setFixJamCommand(true).schedule();
+            feeder.setFixJamCommand(true).schedule();
         } else {
-            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
+            shooter.setFixJamCommand(false).schedule();
+            feeder.setFixJamCommand(false).schedule();
         }
 
+        // Feeder
+        if (gamepad2.right_bumper) {
+            feeder.inCommand().schedule();
+        } else if (gamepad2.left_bumper) {
+            feeder.outCommand().schedule();
+        } else {
+            feeder.stopCommand().schedule();
+        }
+
+        // Pose heading adjustment
         if (gamepad1.dpadLeftWasPressed() || gamepad2.dpadLeftWasPressed()) {
             updatePose(1);
         } else if (gamepad1.dpadRightWasPressed() || gamepad2.dpadRightWasPressed()) {
             updatePose(-1);
         }
+
+        // Assist poses
         if (gamepad1.x) {
             lastAssist = AssistPose.POSE_X;
             if (follower.isTeleopDrive()) {
@@ -150,7 +179,7 @@ public class DriverControlAssist extends LinearOpMode {
             if (follower.isTeleopDrive()) {
                 goToPose(closeShotPose);
             }
-        }else if (gamepad1.b) {
+        } else if (gamepad1.b) {
             if (follower.isTeleopDrive()) {
                 goToPose(parkingPose);
             }
@@ -159,23 +188,12 @@ public class DriverControlAssist extends LinearOpMode {
                 follower.startTeleOpDrive(true);
             }
         }
-        double speed = ROBOT_FAST;
-        double rotSpeed = ROT_FAST;
-        if (gamepad1.a) {
-            speed = ROBOT_SLOW;
-            rotSpeed = ROT_SLOW;
-        }
 
-        double x = square(-gamepad1.left_stick_y) * speed;
-        double y = square(gamepad1.left_stick_x) * speed;
-        if (gamepad1.guide)  {
+        // Heading offset reset
+        if (gamepad1.guide) {
             headingOffset = (int) Math.toDegrees(follower.getHeading());
             blackboard.put("headingOffset", headingOffset);
         }
-        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
-
-        follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
-
     }
 
     private void updatePose(int delta) {
@@ -197,18 +215,25 @@ public class DriverControlAssist extends LinearOpMode {
 
     private void goToPose(Pose target) {
         if (headingOffset < 0) {
-            target = RobotCommon.mirror(target);
+            target = PoseUtil.mirror(target);
         }
-        PathChain path = follower.pathBuilder()
-                .addPath(new BezierLine(follower.getPose(), target))
-                .setConstantHeadingInterpolation(target.getHeading())
-                .setTimeoutConstraint(1500)
-                .build();
-        follower.followPath(path);
+        drive.goToPoseCommand(() -> target).schedule();
+    }
+
+    private void sendTelemetry() {
+        telemetry.addData("x", follower.getPose().getX());
+        telemetry.addData("y", follower.getPose().getY());
+        telemetry.addData("heading", Math.toDegrees(follower.getPose().getHeading()));
+        RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
+        telemetry.addData("headingOffset", headingOffset);
+        telemetry.addData("isTeleopDrive", follower.isTeleopDrive());
+        telemetry.addData("shooterTarget", shooter.getTarget());
+        telemetry.addData("shooter", shooter.getVelocity());
+        telemetry.addData("ball distance", colorSensor.getBallDistance());
+        telemetry.update();
     }
 
     public static double square(double amount) {
         return amount * Math.abs(amount);
     }
-
 }

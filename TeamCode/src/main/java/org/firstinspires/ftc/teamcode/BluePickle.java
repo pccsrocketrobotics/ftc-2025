@@ -9,44 +9,69 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
+import com.seattlesolvers.solverslib.command.WaitCommand;
+
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
+import org.firstinspires.ftc.teamcode.subsystems.ColorSensor;
+import org.firstinspires.ftc.teamcode.subsystems.Drive;
+import org.firstinspires.ftc.teamcode.subsystems.Feeder;
+import org.firstinspires.ftc.teamcode.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.subsystems.LEDs;
+import org.firstinspires.ftc.teamcode.subsystems.Lift;
+import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
 @Autonomous(preselectTeleOp = "DriverControlAssist", group = "Pick up from loading zone and shoot from small tri")
 @Config
-public class BluePickle extends LinearOpMode{
-    private Follower follower;
+public class BluePickle extends CommandOpMode {
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+    protected Drive drive;
+    protected Shooter shooter;
+    protected Intake intake;
+    protected Feeder feeder;
+    protected Follower follower;
 
-    private RobotCommon common;
-    protected Pose startingPose = new Pose(-60,16.8,Math.toRadians(0));
-    protected Pose farShotPose = new Pose(-53.5,13.5,Math.toRadians(23.5));
-    protected Pose loadingPose1 = new Pose(-58,66,Math.toRadians(170));
-    protected Pose loadingPose2 = new Pose(-58,62,Math.toRadians(170));
+    protected Pose startingPose = new Pose(-60, 16.8, Math.toRadians(0));
+    protected Pose farShotPose = new Pose(-53.5, 13.5, Math.toRadians(23.5));
+    protected Pose loadingPose1 = new Pose(-58, 66, Math.toRadians(170));
+    protected Pose loadingPose2 = new Pose(-58, 62, Math.toRadians(170));
     protected Pose loadingFace = new Pose(-72, 64, Math.toRadians(0));
     protected Pose loadingControl1Pose = new Pose(-48, 17);
-    protected Pose loadingControl2Pose =  new Pose(-40, 64);
+    protected Pose loadingControl2Pose = new Pose(-40, 64);
     protected Pose slamPose1 = new Pose(-58, 61, Math.toRadians(105));
     protected Pose slamBackPose = new Pose(-60, 48, Math.toRadians(90));
     protected Pose slamPose2 = new Pose(-62, 62, Math.toRadians(90));
     protected Pose shotControlPose = new Pose(-52, 50);
-    protected Pose endPose = new Pose(-60,60,Math.toRadians(90));
+    protected Pose endPose = new Pose(-60, 60, Math.toRadians(90));
     public static double SHOOTER_AUTON = 1540;
-    public static double FEEDER_TIME = 700;
-    public static double SHOOTING_TIME = 400;
-    public static double START_DELAY = 1500;
-    public static double PICKUP_TIME1 = 2000;
-    public static double PICKUP_TIME2 = 2000;
-    private int shots = 0;
-    private int state = 0;
-    private final ElapsedTime stateTime = new ElapsedTime();
+    public static long START_DELAY = 1500;
+    public static long PICKUP_TIME1 = 2000;
+    public static long PICKUP_TIME2 = 2000;
 
     @Override
-    public void runOpMode() {
-        initialize();
+    public void initialize() {
+        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
+        RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
+
+        follower = Constants.createFollower(hardwareMap);
+        follower.setStartingPose(startingPose);
+        follower.update();
+        blackboard.put("follower", follower);
+
+        shooter = new Shooter(hardwareMap);
+        intake = new Intake(hardwareMap);
+        feeder = new Feeder(hardwareMap);
+        Lift lift = new Lift(hardwareMap);
+        ColorSensor colorSensor = new ColorSensor(hardwareMap);
+        LEDs leds = new LEDs(hardwareMap, shooter, colorSensor);
+        drive = new Drive(follower);
+
+        register(drive, shooter, intake, feeder, lift, colorSensor, leds);
 
         PathChain shootingPath = follower.pathBuilder()
                 .addPath(new BezierLine(startingPose, farShotPose))
@@ -62,41 +87,28 @@ public class BluePickle extends LinearOpMode{
                 .addPath(new BezierLine(slamBackPose, slamPose2))
                 .setConstantHeadingInterpolation(slamPose2.getHeading())
                 .build();
-
-//                .addPath(new BezierCurve(
-//                    farShotPose,
-//                    loadingControl1Pose,
-//                    loadingControl2Pose,
-//                    loadingPose1
-//                ))
-//                .setHeadingInterpolation(RobotCommon.facingPoint(loadingFace.getX(), loadingFace.getY()))
-//                .setHeadingInterpolation(HeadingInterpolator.piecewise(
-//                    new HeadingInterpolator.PiecewiseNode(0, 0.5, HeadingInterpolator.tangent),
-//                    new HeadingInterpolator.PiecewiseNode(0.5, 1.0, HeadingInterpolator.constant(loadingPose1.getHeading()))
-//                ))
-//                .build();
         PathChain shootingPath2 = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                    loadingPose1,
-                    shotControlPose,
-                    farShotPose
+                        loadingPose1,
+                        shotControlPose,
+                        farShotPose
                 ))
                 .setConstantHeadingInterpolation(farShotPose.getHeading())
                 .build();
         PathChain loadingZonePath2 = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                    farShotPose,
-                    loadingControl1Pose,
-                    loadingControl2Pose,
-                    loadingPose2
+                        farShotPose,
+                        loadingControl1Pose,
+                        loadingControl2Pose,
+                        loadingPose2
                 ))
-                .setHeadingInterpolation(RobotCommon.facingPoint(loadingFace.getX(), loadingFace.getY()))
+                .setHeadingInterpolation(PoseUtil.facingPoint(loadingFace.getX(), loadingFace.getY()))
                 .build();
         PathChain shootingPath3 = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                    loadingPose2,
-                    shotControlPose,
-                    farShotPose
+                        loadingPose2,
+                        shotControlPose,
+                        farShotPose
                 ))
                 .setConstantHeadingInterpolation(farShotPose.getHeading())
                 .build();
@@ -105,176 +117,44 @@ public class BluePickle extends LinearOpMode{
                 .setConstantHeadingInterpolation(endPose.getHeading())
                 .build();
 
-        waitForStart();
-        if (opModeIsActive()) {
-            while (opModeIsActive()) {
-                switch (state) {
-                    case 0:
-                        common.setIntakeDirection(RobotCommon.ShaftDirection.IN);
-                        common.setShooterTarget(SHOOTER_AUTON);
-                        follower.followPath(shootingPath);
-                        changeState(1);
-                        break;
-                    case 1:
-                        if (!follower.isBusy() && stateTime.milliseconds() > START_DELAY) {
-                            changeState(2);
-                        }
-                        break;
-                    case 2:
-                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
-                        changeState(3);
-                        break;
-                    case 3:
-                        if (stateTime.milliseconds() > FEEDER_TIME) {
-                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
-                            changeState(4);
-                        }
-                        break;
-                    case 4:
-                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
-                            shots++;
-                            if (shots < 3) {
-                                changeState(2);
-                            } else {
-                                changeState(5);
-                            }
-                        }
-                        break;
-                    case 5:
-                        follower.followPath(loadingZonePath);
-                        changeState(6);
-                        break;
-                    case 6:
-                        if (stateTime.milliseconds() > PICKUP_TIME1) {
-                            changeState(600);
-                        }
-                        break;
-                    case 600:
-                        follower.followPath(slamBackPath);
-                        changeState(601);
-                        break;
-                    case 601:
-                        if (stateTime.milliseconds() > PICKUP_TIME1) {
-                            changeState(9);
-                        }
-                        break;
-                    case 9:
-                        shots = 0;
-                        follower.followPath(shootingPath2);
-                        changeState(10);
-                        break;
-                    case 10:
-                        if (!follower.isBusy()) {
-                            changeState(11);
-                        }
-                        break;
-                    case 11:
-                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
-                        changeState(12);
-                        break;
-                    case 12:
-                        if (stateTime.milliseconds() > FEEDER_TIME) {
-                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
-                            changeState(13);
-                        }
-                        break;
-                    case 13:
-                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
-                            shots++;
-                            if (shots < 3) {
-                                changeState(11);
-                            } else {
-                                changeState(14);
-                            }
-                        }
-                        break;
-                    case 14:
-                        follower.followPath(loadingZonePath2);
-                        changeState(15);
-                        break;
-                    case 15:
-                        if (!follower.isBusy() || stateTime.milliseconds() > PICKUP_TIME2) {
-                            changeState(18);
-                        }
-                        break;
-                    case 18:
-                        shots = 0;
-                        follower.followPath(shootingPath3);
-                        changeState(19);
-                        break;
-                    case 19:
-                        if (!follower.isBusy()) {
-                            changeState(20);
-                        }
-                        break;
-                    case 20:
-                        common.setFeederDirection(RobotCommon.ShaftDirection.IN);
-                        changeState(21);
-                        break;
-                    case 21:
-                        if (stateTime.milliseconds() > FEEDER_TIME) {
-                            common.setFeederDirection(RobotCommon.ShaftDirection.STOP);
-                            changeState(22);
-                        }
-                        break;
-                    case 22:
-                        if (stateTime.milliseconds() > SHOOTING_TIME || shots >= 2) {
-                            shots++;
-                            if (shots < 3) {
-                                changeState(20);
-                            } else {
-                                changeState(23);
-                            }
-                        }
-                        break;
-                    case 23:
-                        common.setShooterTarget(0);
-                        follower.followPath(endPath);
-                        changeState(24);
-                        break;
-                    case 24:
-                        if (!follower.isBusy()) {
-                            //common.setIntakeDirection(RobotCommon.ShaftDirection.STOP);
-                            changeState(25);
-                        }
-                        break;
-                }
+        schedule(new SequentialCommandGroup(
+                // Start intake + shooter, drive to shooting pose, wait for START_DELAY
+                new ParallelCommandGroup(
+                        intake.inCommand(),
+                        shooter.shootCommand(SHOOTER_AUTON),
+                        drive.followPathCommand(shootingPath),
+                        new WaitCommand(START_DELAY)
+                ),
+                // First round: 3 shots
+                feeder.shootSequenceCommand(3),
+                // Drive to loading zone, wait for pickup
+                drive.followPathCommand(loadingZonePath),
+                new WaitCommand(PICKUP_TIME1),
+                // Slam back and pick up more
+                drive.followPathCommand(slamBackPath),
+                new WaitCommand(PICKUP_TIME1),
+                // Drive to shooting pose
+                drive.followPathCommand(shootingPath2),
+                // Second round: 3 shots
+                feeder.shootSequenceCommand(3),
+                // Drive to loading zone 2, wait for pickup or timeout
+                new ParallelRaceGroup(
+                        drive.followPathCommand(loadingZonePath2),
+                        new WaitCommand(PICKUP_TIME2)
+                ),
+                // Drive to shooting pose
+                drive.followPathCommand(shootingPath3),
+                // Third round: 3 shots
+                feeder.shootSequenceCommand(3),
+                // Stop and drive to end
+                shooter.stopCommand(),
+                drive.followPathCommand(endPath)
+        ));
 
-                follower.update();
-                common.runAuton();
-                common.runAprilTags();
-                common.correctPose(follower);
-                sendTelemetry();
-            }
-        }
-    }
-    private void changeState(int newState) {
-        state = newState;
-        stateTime.reset();
-    }
-
-    private void initialize() {
-        telemetry = new MultipleTelemetry(telemetry, dashboardTelemetry);
-        RobotDrawing.setDashboardTelemetry(FtcDashboard.getInstance().getTelemetry());
-        common = new RobotCommon();
-        common.initialize(hardwareMap);
-        common.initAprilTag(hardwareMap);
-        follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startingPose);
-        follower.update();
-        blackboard.put("follower", follower);
-        sendTelemetry();
         setBlackboard();
     }
+
     protected void setBlackboard() {
         blackboard.put("headingOffset", 90);
-    }
-
-    private void sendTelemetry() {
-        telemetry.addData("state",state);
-        telemetry.addData("shots",shots);
-        common.addPedroPathingTelemetry(telemetry, dashboardTelemetry, follower);
-        RobotDrawing.draw(dashboardTelemetry.getCurrentPacket(), follower);
-        common.sendTelemetry(telemetry);
     }
 }
