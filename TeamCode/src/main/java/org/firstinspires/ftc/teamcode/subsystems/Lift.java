@@ -8,6 +8,8 @@ import com.seattlesolvers.solverslib.command.Command;
 import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
+import java.util.function.IntSupplier;
+
 @Config
 public class Lift extends SubsystemBase {
     public static int LIFT_VELOCITY = 5000;
@@ -28,28 +30,23 @@ public class Lift extends SubsystemBase {
         rightLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    @Override
-    public void periodic() {
-        // NOTE: nothing should be in this loop
+    public int getTargetPosition() {
+        return targetPosition;
+    }
+
+    private void setMotors(int position) {
+        targetPosition = Math.max(0, Math.min(LIFT_MAX, position));
         rightLift.setTargetPosition(targetPosition);
         leftLift.setTargetPosition(targetPosition);
         leftLift.setVelocity(LIFT_VELOCITY);
         rightLift.setVelocity(LIFT_VELOCITY);
     }
 
-    public int getTargetPosition() {
-        return targetPosition;
-    }
-
     public Command setPositionCommand(int position) {
-        // NOTE: refactor to set the position of the motor directly using a supplier
-        return new InstantCommand(() -> targetPosition = position, this);
+        return runOnce(() -> setMotors(position));
     }
 
     public Command adjustCommand(int delta) {
-        // NOTE: refactor to set the position of the motor directly using a supplier
-        return new InstantCommand(() -> {
-            targetPosition = Math.max(0, Math.min(LIFT_MAX, targetPosition + delta));
-        }, this);
+        return runOnce(() -> setMotors(targetPosition + delta));
     }
 }

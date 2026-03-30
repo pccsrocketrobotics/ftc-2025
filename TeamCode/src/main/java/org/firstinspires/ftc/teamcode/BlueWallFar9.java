@@ -96,32 +96,24 @@ public class BlueWallFar9 extends CommandOpMode {
                 .build();
 
         schedule(new SequentialCommandGroup(
-                // Start intake + shooter, drive to shooting pose, wait for START_DELAY
                 new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON),
+                    intake.inCommand(),
+                    shooter.shootCommand(SHOOTER_AUTON),
+                    new SequentialCommandGroup(
                         drive.followPathCommand(shootingPath),
-                        new WaitCommand(START_DELAY)
+                        new WaitCommand(START_DELAY),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(ballAlignPath),
+                        drive.followPathCommand(ballPickupPath),
+                        drive.followPathCommand(shootingPath2),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(ballAlignPath2),
+                        drive.followPathCommand(ballPickupPath2),
+                        drive.followPathCommand(shootingPath3),
+                        feeder.shootSequenceCommand(3)
+                    )
                 ),
-                // First round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Pick up second set
-                drive.followPathCommand(ballAlignPath),
-                drive.followPathCommand(ballPickupPath),
-                drive.followPathCommand(shootingPath2),
-                // Second round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Pick up third set
-                drive.followPathCommand(ballAlignPath2),
-                drive.followPathCommand(ballPickupPath2),
-                drive.followPathCommand(shootingPath3),
-                // Third round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Stop and drive to end
-                new ParallelCommandGroup(
-                        shooter.stopCommand(),
-                        intake.stopCommand()
-                ),
+                // drive to end (with shooter and intake off)
                 drive.followPathCommand(endPath)
         ));
 

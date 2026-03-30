@@ -118,36 +118,24 @@ public class BluePickle extends CommandOpMode {
                 .build();
 
         schedule(new SequentialCommandGroup(
-                // Start intake + shooter, drive to shooting pose, wait for START_DELAY
                 new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON),
+                    intake.inCommand(),
+                    shooter.shootCommand(SHOOTER_AUTON),
+                    new SequentialCommandGroup(
                         drive.followPathCommand(shootingPath),
-                        new WaitCommand(START_DELAY)
+                        new WaitCommand(START_DELAY),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(loadingZonePath),
+                        new WaitCommand(PICKUP_TIME1),
+                        drive.followPathCommand(slamBackPath),
+                        new WaitCommand(PICKUP_TIME1),
+                        drive.followPathCommand(shootingPath2),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(loadingZonePath2).withTimeout(PICKUP_TIME2),
+                        drive.followPathCommand(shootingPath3),
+                        feeder.shootSequenceCommand(3)
+                    )
                 ),
-                // First round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Drive to loading zone, wait for pickup
-                drive.followPathCommand(loadingZonePath),
-                new WaitCommand(PICKUP_TIME1),
-                // Slam back and pick up more
-                drive.followPathCommand(slamBackPath),
-                new WaitCommand(PICKUP_TIME1),
-                // Drive to shooting pose
-                drive.followPathCommand(shootingPath2),
-                // Second round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Drive to loading zone 2, wait for pickup or timeout
-                new ParallelRaceGroup(
-                        drive.followPathCommand(loadingZonePath2),
-                        new WaitCommand(PICKUP_TIME2)
-                ),
-                // Drive to shooting pose
-                drive.followPathCommand(shootingPath3),
-                // Third round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Stop and drive to end
-                shooter.stopCommand(),
                 drive.followPathCommand(endPath)
         ));
 

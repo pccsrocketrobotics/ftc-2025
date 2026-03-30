@@ -25,7 +25,7 @@ Refactor the monolithic `RobotCommon` class and procedural OpModes into SolversL
 - **Commands (factory methods):**
   - `shootCommand(double velocity)` — sets target velocity (instant)
   - `stopCommand()` — sets velocity to 0 (instant)
-  - `setFixJamCommand(boolean fix)` — enables/disables jam fix mode (instant)
+  - `fixJamCommand(boolean fix)` — enables/disables jam fix mode (instant)
   - `waitUntilAtTargetCommand()` — waits until shooter velocity is within tolerance of target
 
 ### 3. Intake
@@ -45,7 +45,7 @@ Refactor the monolithic `RobotCommon` class and procedural OpModes into SolversL
   - `inCommand()` — sets feeder to IN (instant)
   - `outCommand()` — sets feeder to OUT (instant)
   - `stopCommand()` — sets feeder to STOP (instant)
-  - `setFixJamCommand(boolean fix)` — enables/disables jam fix mode (instant)
+  - `fixJamCommand(boolean fix)` — enables/disables jam fix mode (instant)
   - `feedOneShotCommand()` — SequentialCommandGroup: IN → wait 700ms → STOP → wait 400ms
   - `shootSequenceCommand(int shots)` — repeats `feedOneShotCommand()` N times
 
@@ -99,9 +99,9 @@ Package: `com.seattlesolvers.solverslib` (replaces `com.arcrobotics.ftclib`).
 ### Phase 2: Create Subsystem Classes
 All subsystems extend `com.seattlesolvers.solverslib.command.SubsystemBase`.
 
-2. **Shooter** — Extract from `RobotCommon`: shooter motor init, PIDF controller, `periodic()` runs PIDF loop. Factory methods: `setVelocityCommand()`, `stopCommand()`, `setFixJamCommand()`, `waitUntilAtTargetCommand()`.
+2. **Shooter** — Extract from `RobotCommon`: shooter motor init, PIDF controller, `periodic()` runs PIDF loop. Factory methods: `setVelocityCommand()`, `stopCommand()`, `fixJamCommand()`, `waitUntilAtTargetCommand()`.
 3. **Intake** — Extract: intake motor + agitator servo init, `periodic()` applies power based on direction. Factory methods: `inCommand()`, `outCommand()`, `stopCommand()`.
-4. **Feeder** — Extract: leftFeeder + rightFeeder servo init, `periodic()` applies power, jam fix support. Factory methods: `inCommand()`, `outCommand()`, `stopCommand()`, `setFixJamCommand()`, `feedOneShotCommand()`, `shootSequenceCommand()`.
+4. **Feeder** — Extract: leftFeeder + rightFeeder servo init, `periodic()` applies power, jam fix support. Factory methods: `inCommand()`, `outCommand()`, `stopCommand()`, `fixJamCommand()`, `feedOneShotCommand()`, `shootSequenceCommand()`.
 5. **Lift** — Extract: leftLift + rightLift motor init (RUN_TO_POSITION), `periodic()` sends target to motors. Factory methods: `setPositionCommand()`, `adjustCommand()`.
 6. **ColorSensor** — Extract: color sensor init, `periodic()` reads distance. No commands.
 7. **LEDs** — Extract: 4 LED init, takes Shooter + ColorSensor refs, `periodic()` updates LED state. No commands.
@@ -187,7 +187,7 @@ All subsystems extend `com.seattlesolvers.solverslib.command.SubsystemBase`.
 - [x] Add `getTarget()` method — returns `shooterTarget`
 - [x] Factory method `shootCommand(double velocity)` — returns `InstantCommand` setting `shooterTarget`
 - [x] Factory method `stopCommand()` — returns `InstantCommand` setting `shooterTarget = 0`
-- [x] Factory method `setFixJamCommand(boolean fix)` — returns `InstantCommand` setting `fixJam`
+- [x] Factory method `fixJamCommand(boolean fix)` — returns `InstantCommand` setting `fixJam`
 - [x] Factory method `waitUntilAtTargetCommand()` — returns `WaitUntilCommand` checking `Math.abs(shooter.getVelocity() - shooterTarget) < 100`
 
 ### Phase 2: Intake Subsystem
@@ -212,7 +212,7 @@ All subsystems extend `com.seattlesolvers.solverslib.command.SubsystemBase`.
 - [x] Factory method `inCommand()` — returns `InstantCommand` setting direction to IN
 - [x] Factory method `outCommand()` — returns `InstantCommand` setting direction to OUT
 - [x] Factory method `stopCommand()` — returns `InstantCommand` setting direction to STOP
-- [x] Factory method `setFixJamCommand(boolean fix)` — returns `InstantCommand` setting `fixJam`
+- [x] Factory method `fixJamCommand(boolean fix)` — returns `InstantCommand` setting `fixJam`
 - [x] Factory method `feedOneShotCommand()` — returns `SequentialCommandGroup`: `inCommand()` → `WaitCommand(0.7)` → `stopCommand()` → `WaitCommand(0.4)` (700ms feed + 400ms shooting pause)
 - [x] Factory method `shootSequenceCommand(int shots)` — returns `SequentialCommandGroup` repeating `feedOneShotCommand()` N times
 
@@ -306,8 +306,8 @@ All subsystems extend `com.seattlesolvers.solverslib.command.SubsystemBase`.
 - [x] Bind gamepad2.x → `shooter.shootCommand(SHOOTER_X)`
 - [x] Bind gamepad2.back → `shooter.shootCommand(SHOOTER_BACK)`
 - [x] Bind gamepad2.guide → `shooter.stopCommand()`
-- [x] Bind gamepad2.dpad_down (held) → `shooter.setFixJamCommand(true)` + `feeder.setFixJamCommand(true)`
-- [x] Bind gamepad2.dpad_down (released) → `shooter.setFixJamCommand(false)` + `feeder.setFixJamCommand(false)`
+- [x] Bind gamepad2.dpad_down (held) → `shooter.fixJamCommand(true)` + `feeder.fixJamCommand(true)`
+- [x] Bind gamepad2.dpad_down (released) → `shooter.fixJamCommand(false)` + `feeder.fixJamCommand(false)`
 - [x] Bind gamepad2.right_bumper → `feeder.inCommand()`
 - [x] Bind gamepad2.left_bumper → `feeder.outCommand()`
 - [x] Bind gamepad2.right_bumper/left_bumper release → `feeder.stopCommand()`

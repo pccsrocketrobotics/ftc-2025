@@ -89,24 +89,20 @@ public class BlueGate9 extends CommandOpMode {
                 .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose2.getHeading())
                 .build();
 
-        schedule(new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON)
-                ),
-                drive.followPathCommand(shootingPath),
-                feeder.shootSequenceCommand(3),
-                drive.followPathCommand(ballAlignPath),
-                drive.followPathCommand(ballPickupPath),
-                drive.followPathCommand(shootingPath2),
-                feeder.shootSequenceCommand(3),
-                drive.followPathCommand(ballAlignPath2),
-                drive.followPathCommand(ballPickupPath2),
-                drive.followPathCommand(shootingPath3),
-                feeder.shootSequenceCommand(3),
-                new ParallelCommandGroup(
-                        shooter.stopCommand(),
-                        intake.stopCommand()
+        schedule(new ParallelCommandGroup(
+                intake.inCommand(),
+                shooter.shootCommand(SHOOTER_AUTON),
+                new SequentialCommandGroup(
+                    drive.followPathCommand(shootingPath),
+                    feeder.shootSequenceCommand(3),
+                    drive.followPathCommand(ballAlignPath),
+                    drive.followPathCommand(ballPickupPath),
+                    drive.followPathCommand(shootingPath2),
+                    feeder.shootSequenceCommand(3),
+                    drive.followPathCommand(ballAlignPath2),
+                    drive.followPathCommand(ballPickupPath2),
+                    drive.followPathCommand(shootingPath3),
+                    feeder.shootSequenceCommand(3)
                 )
         ));
 

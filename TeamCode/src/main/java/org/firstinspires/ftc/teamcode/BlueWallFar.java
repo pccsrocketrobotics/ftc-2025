@@ -9,6 +9,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
@@ -78,26 +79,18 @@ public class BlueWallFar extends CommandOpMode {
                 .build();
 
         schedule(new SequentialCommandGroup(
-                // Start intake + shooter, drive to shooting pose, wait for START_DELAY
                 new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON),
+                    intake.inCommand(),
+                    shooter.shootCommand(SHOOTER_AUTON),
+                    new SequentialCommandGroup(
                         drive.followPathCommand(shootingPath),
-                        new WaitCommand(START_DELAY)
-                ),
-                // First round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Drive to ball align, then pickup
-                drive.followPathCommand(ballAlignPath),
-                drive.followPathCommand(ballPickupPath),
-                // Drive back to shooting pose
-                drive.followPathCommand(shootingPath2),
-                // Second round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Stop and drive to end (align pose)
-                new ParallelCommandGroup(
-                        shooter.stopCommand(),
-                        intake.stopCommand()
+                        new WaitCommand(START_DELAY),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(ballAlignPath),
+                        drive.followPathCommand(ballPickupPath),
+                        drive.followPathCommand(shootingPath2),
+                        feeder.shootSequenceCommand(3)
+                    )
                 ),
                 drive.followPathCommand(ballAlignPath)
         ));

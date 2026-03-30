@@ -15,6 +15,9 @@ public class ColorSensor extends SubsystemBase {
     private final NormalizedColorSensor colorSensor;
     private double ballDistance;
 
+    private static final int READ_INTERVAL = 10;
+    private int readCounter = 0;
+
     public ColorSensor(HardwareMap hardwareMap) {
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "color");
         colorSensor.setGain(COLOR_GAIN);
@@ -22,7 +25,10 @@ public class ColorSensor extends SubsystemBase {
 
     @Override
     public void periodic() {
-        ballDistance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+        if (readCounter++ >= READ_INTERVAL) {
+            ballDistance = ((DistanceSensor) colorSensor).getDistance(DistanceUnit.CM);
+            readCounter = 0;
+        }
     }
 
     public double getBallDistance() {

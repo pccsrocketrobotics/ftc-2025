@@ -82,18 +82,16 @@ public class BlueGate extends CommandOpMode {
 
         schedule(new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON)
-                ),
-                drive.followPathCommand(shootingPath),
-                feeder.shootSequenceCommand(3),
-                drive.followPathCommand(ballAlignPath),
-                drive.followPathCommand(ballPickupPath),
-                drive.followPathCommand(shootingPath2),
-                feeder.shootSequenceCommand(3),
-                new ParallelCommandGroup(
-                        shooter.stopCommand(),
-                        intake.stopCommand()
+                    intake.inCommand(),
+                    shooter.shootCommand(SHOOTER_AUTON),
+                    new SequentialCommandGroup(
+                        drive.followPathCommand(shootingPath),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(ballAlignPath),
+                        drive.followPathCommand(ballPickupPath),
+                        drive.followPathCommand(shootingPath2),
+                        feeder.shootSequenceCommand(3)
+                    )
                 ),
                 drive.followPathCommand(endPath)
         ));

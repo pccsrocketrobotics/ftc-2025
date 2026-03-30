@@ -14,6 +14,11 @@ public class LEDs extends SubsystemBase {
     private final ColorSensor colorSensor;
     private final ElapsedTime ledTimer = new ElapsedTime();
 
+    private boolean oldRed = false;
+    private boolean oldBlue = false;
+    private boolean oldYellow = false;
+    private boolean oldGreen = false;
+
     public LEDs(HardwareMap hardwareMap, Shooter shooter, ColorSensor colorSensor) {
         this.shooter = shooter;
         this.colorSensor = colorSensor;
@@ -33,7 +38,6 @@ public class LEDs extends SubsystemBase {
         boolean red = false;
         boolean blue = false;
         boolean yellow = false;
-        boolean green = false;
 
         if (shooter.getVelocity() < 100 && shooter.getTarget() == 0) {
             ledTimer.reset();
@@ -48,12 +52,23 @@ public class LEDs extends SubsystemBase {
             ledTimer.reset();
             yellow = true;
         }
-        green = colorSensor.hasBall();
+        boolean green = colorSensor.hasBall();
 
-        // NOTE: only update the LEDs if the state changes to avoid multiple hardware writes
-        redLed.enable(red);
-        blueLed.enable(blue);
-        yellowLed.enable(yellow);
-        greenLed.enable(green);
+        if (red != oldRed) {
+            redLed.enable(red);
+        }
+        if (blue != oldBlue) {
+            blueLed.enable(blue);
+        }
+        if (yellow != oldYellow) {
+            yellowLed.enable(yellow);
+        }
+        if (green != oldGreen) {
+            greenLed.enable(green);
+        }
+        oldRed = red;
+        oldBlue = blue;
+        oldYellow = yellow;
+        oldGreen = green;
     }
 }

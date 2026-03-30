@@ -76,25 +76,17 @@ public class BlueWallMid extends CommandOpMode {
                 .build();
 
         schedule(new SequentialCommandGroup(
-                // Start intake + shooter, drive to shooting pose
                 new ParallelCommandGroup(
-                        intake.inCommand(),
-                        shooter.shootCommand(SHOOTER_AUTON),
-                        drive.followPathCommand(shootingPath)
-                ),
-                // First round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Drive to ball align, then pickup
-                drive.followPathCommand(ballAlignPath),
-                drive.followPathCommand(ballPickupPath),
-                // Drive back to shooting pose
-                drive.followPathCommand(shootingPath2),
-                // Second round: 3 shots
-                feeder.shootSequenceCommand(3),
-                // Stop and drive to end (align pose)
-                new ParallelCommandGroup(
-                        shooter.stopCommand(),
-                        intake.stopCommand()
+                    intake.inCommand(),
+                    shooter.shootCommand(SHOOTER_AUTON),
+                    new SequentialCommandGroup(
+                        drive.followPathCommand(shootingPath),
+                        feeder.shootSequenceCommand(3),
+                        drive.followPathCommand(ballAlignPath),
+                        drive.followPathCommand(ballPickupPath),
+                        drive.followPathCommand(shootingPath2),
+                        feeder.shootSequenceCommand(3)
+                    )
                 ),
                 drive.followPathCommand(ballAlignPath)
         ));
