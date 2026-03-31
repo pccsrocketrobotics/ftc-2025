@@ -10,7 +10,7 @@ import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.InstantCommand;
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 import com.seattlesolvers.solverslib.command.WaitCommand;
 
@@ -79,7 +79,7 @@ public class BlueWallFar extends CommandOpMode {
                 .build();
 
         schedule(new SequentialCommandGroup(
-                new ParallelCommandGroup(
+                new ParallelRaceGroup(
                     intake.inCommand(),
                     shooter.shootCommand(SHOOTER_AUTON),
                     new SequentialCommandGroup(

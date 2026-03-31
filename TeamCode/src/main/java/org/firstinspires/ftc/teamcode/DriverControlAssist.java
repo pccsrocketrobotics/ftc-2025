@@ -189,7 +189,7 @@ public class DriverControlAssist extends CommandOpMode {
                     .build();
                 follower.followPath(path);
             },
-            () -> {},
+            () -> follower.breakFollowing(),
             drive
         );
     }

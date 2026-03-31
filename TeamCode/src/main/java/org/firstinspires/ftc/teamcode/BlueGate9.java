@@ -9,7 +9,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.ParallelCommandGroup;
+import com.seattlesolvers.solverslib.command.ParallelRaceGroup;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import org.firstinspires.ftc.teamcode.dashboard.DashboardTelemetry;
@@ -89,7 +89,7 @@ public class BlueGate9 extends CommandOpMode {
                 .setLinearHeadingInterpolation(pickupPose1.getHeading(), halfShotPose2.getHeading())
                 .build();
 
-        schedule(new ParallelCommandGroup(
+        schedule(new ParallelRaceGroup(
                 intake.inCommand(),
                 shooter.shootCommand(SHOOTER_AUTON),
                 new SequentialCommandGroup(
