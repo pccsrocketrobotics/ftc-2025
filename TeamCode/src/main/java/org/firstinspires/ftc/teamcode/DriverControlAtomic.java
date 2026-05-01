@@ -14,16 +14,18 @@ import org.firstinspires.ftc.teamcode.pedroPathing.RobotDrawing;
 
 @TeleOp
 @Config
-public class DriverControlAssist extends LinearOpMode {
+public class DriverControlAtomic extends LinearOpMode {
     private RobotCommon common;
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
+
     private enum AssistPose {
         POSE_X,
         POSE_Y,
         POSE_BACK,
         POSE_TRIGGER
     }
+
     private AssistPose lastAssist = AssistPose.POSE_BACK;
     public static double ROBOT_SLOW = 0.5;
     public static double ROBOT_FAST = 1;
@@ -32,12 +34,13 @@ public class DriverControlAssist extends LinearOpMode {
     public static int LIFT_MAX = 2800;
     public static double SHOOTER_X = 1375;
     public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_BACK = 1540;
+    public static double SHOOTER_BACK = 1460;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
-    protected Pose halfShotPose = new Pose(27.5,27,Math.toRadians(45));
-    protected Pose farShotPose = new Pose(-54.5,12.5,Math.toRadians(23.5));
-    protected Pose midShotPose = new Pose(0,0,Math.toRadians(45));
+    protected Pose halfShotPose = new Pose(27.5, 27, Math.toRadians(45));
+    protected Pose farShotLeftPose = new Pose(-41, -24, Math.toRadians(-160));
+    protected Pose farShotRightPose = new Pose(-46.8, 32.9, Math.toRadians(15));
+    protected Pose midShotPose = new Pose(0, 0, Math.toRadians(45));
     protected Pose closeShotPose = new Pose(42, -4, Math.toRadians(75));
     protected Pose parkingPose = new Pose(-35.5, -35, Math.toRadians(180));
 
@@ -46,7 +49,7 @@ public class DriverControlAssist extends LinearOpMode {
         initialize();
 
         waitForStart();
-        if(opModeIsActive()) {
+        if (opModeIsActive()) {
             while (opModeIsActive()) {
                 controls();
                 follower.update();
@@ -70,7 +73,8 @@ public class DriverControlAssist extends LinearOpMode {
         follower.update();
         follower.startTeleOpDrive(true);
         if (blackboard.containsKey("headingOffset")) {
-            headingOffset = (int)blackboard.get("headingOffset");
+            //noinspection DataFlowIssue
+            headingOffset = (int) blackboard.get("headingOffset");
         }
         sendTelemetry();
     }
@@ -140,21 +144,21 @@ public class DriverControlAssist extends LinearOpMode {
             if (follower.isTeleopDrive()) {
                 goToPose(midShotPose);
             }
-        } else if (gamepad1.back) {
+        } else if (gamepad1.back || gamepad1.right_bumper) {
             lastAssist = AssistPose.POSE_BACK;
             if (follower.isTeleopDrive()) {
-                goToPose(farShotPose);
+                goToPose(farShotRightPose);
             }
-        } else if (gamepad1.right_bumper || gamepad1.left_bumper) {
-            lastAssist = AssistPose.POSE_TRIGGER;
-            if (follower.isTeleopDrive()) {
-                goToPose(closeShotPose);
-            }
-        }else if (gamepad1.b) {
+        } else if (gamepad1.b) {
             if (follower.isTeleopDrive()) {
                 goToPose(parkingPose);
             }
-        } else {
+        } else if (gamepad1.left_bumper) {
+            if (follower.isTeleopDrive()) {
+                goToPose(farShotLeftPose);
+            }
+        }
+        else {
             if (!follower.isTeleopDrive()) {
                 follower.startTeleOpDrive(true);
             }
@@ -168,11 +172,11 @@ public class DriverControlAssist extends LinearOpMode {
 
         double x = square(-gamepad1.left_stick_y) * speed;
         double y = square(gamepad1.left_stick_x) * speed;
-        if (gamepad1.guide)  {
+        if (gamepad1.guide) {
             headingOffset = (int) Math.toDegrees(follower.getHeading());
             blackboard.put("headingOffset", headingOffset);
         }
-        double rot = square(gamepad1.right_trigger-gamepad1.left_trigger) * rotSpeed;
+        double rot = square(gamepad1.right_trigger - gamepad1.left_trigger) * rotSpeed;
 
         follower.setTeleOpDrive(x, -y, -rot, false, Math.toRadians(headingOffset));
 
@@ -187,7 +191,7 @@ public class DriverControlAssist extends LinearOpMode {
                 midShotPose = midShotPose.setHeading(midShotPose.getHeading() + Math.toRadians(delta));
                 break;
             case POSE_BACK:
-                farShotPose = farShotPose.setHeading(farShotPose.getHeading() + Math.toRadians(delta));
+                farShotLeftPose = farShotLeftPose.setHeading(farShotLeftPose.getHeading() + Math.toRadians(delta));
                 break;
             case POSE_TRIGGER:
                 closeShotPose = closeShotPose.setHeading(closeShotPose.getHeading() + Math.toRadians(delta));
@@ -196,7 +200,12 @@ public class DriverControlAssist extends LinearOpMode {
     }
 
     private void goToPose(Pose target) {
-        if (headingOffset < 0) {
+        boolean isBlueAlliance = true;
+        if (blackboard.containsKey("isBlueAlliance")) {
+            //noinspection DataFlowIssue
+            isBlueAlliance = (boolean) blackboard.get("isBlueAlliance");
+        }
+        if (!isBlueAlliance) {
             target = RobotCommon.mirror(target);
         }
         PathChain path = follower.pathBuilder()
@@ -210,5 +219,4 @@ public class DriverControlAssist extends LinearOpMode {
     public static double square(double amount) {
         return amount * Math.abs(amount);
     }
-
 }

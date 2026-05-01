@@ -18,12 +18,19 @@ apply from: '../build.dependencies.gradle'
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
 
+
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
 }
 
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
     implementation project(':FtcRobotController')
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:3.0.6'
+    implementation 'com.github.ori-coval.Koala-Log:KoalaLogger:1.4.1'
+    annotationProcessor 'com.github.ori-coval.Koala-Log:KoalaLoggingProcessor:1.4.1'
 }

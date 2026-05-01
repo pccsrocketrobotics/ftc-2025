@@ -37,11 +37,15 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import java.util.List;
 
+import Ori.Coval.Logging.DoNotLog;
+import Ori.Coval.Logging.Logger.KoalaLog;
+import Ori.Coval.Logging.ReflectionLogger;
+
 @Config
 public class RobotCommon {
 
-    public static int MAX_WHEEL_SPEED = 5500;
-    public static int LIFT_VELOCITY = 5000;
+   @DoNotLog public static int MAX_WHEEL_SPEED = 5500;
+    @DoNotLog public static int LIFT_VELOCITY = 5000;
 
     private double vx;
     private double vy;
@@ -143,6 +147,12 @@ public class RobotCommon {
         blueLed.off();
 
         colorSensor.setGain(COLOR_GAIN);
+
+        KoalaLog.setup(hardwareMap);
+        ReflectionLogger.register(this);
+    }
+    public void close() {
+        KoalaLog.close();
     }
 
     public void run() {
@@ -381,6 +391,8 @@ public class RobotCommon {
         telemetry.addData("intake",intakeDirection);
         telemetry.addData("ball distance", ballDistance);
         telemetry.update();
+
+        ReflectionLogger.update();
     }
 
     public void addPedroPathingTelemetry(Telemetry telemetry, Telemetry dashboardTelemetry, Follower follower) {
@@ -411,6 +423,7 @@ public class RobotCommon {
         telemetry.addData("xOffset", xFilter.getState());
         telemetry.addData("yOffset", yFilter.getState());
         telemetry.addData("headingOffset", Math.toDegrees(headingFilter.getState()));
+        KoalaLog.logPose2d("robotPose", follower.getPose().getX()*0.0254, follower.getPose().getY()*0.0254, follower.getPose().getHeading()*0.0254, true);
     }
 
     public static Pose mirror(Pose p) {
