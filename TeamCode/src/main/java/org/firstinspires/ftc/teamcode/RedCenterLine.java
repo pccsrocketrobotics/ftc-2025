@@ -9,7 +9,6 @@ public class RedCenterLine extends BlueCenterLine {
 
     @Override
     public void runOpMode() {
-        startingPose = RobotCommon.mirror(startingPose);
         super.runOpMode();
     }
     @Override

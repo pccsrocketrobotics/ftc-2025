@@ -34,15 +34,17 @@ public class DriverControlAtomic extends LinearOpMode {
     public static int LIFT_MAX = 2800;
     public static double SHOOTER_X = 1375;
     public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_BACK = 1460;
+    public static double SHOOTER_BACK = 1480;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
-    protected Pose halfShotPose = new Pose(27.5, 27, Math.toRadians(45));
-    protected Pose farShotLeftPose = new Pose(-41, -24, Math.toRadians(-160));
-    protected Pose farShotRightPose = new Pose(-46.8, 32.9, Math.toRadians(15));
-    protected Pose midShotPose = new Pose(0, 0, Math.toRadians(45));
-    protected Pose closeShotPose = new Pose(42, -4, Math.toRadians(75));
-    protected Pose parkingPose = new Pose(-35.5, -35, Math.toRadians(180));
+    private boolean isBlueAlliance = true;
+    protected Pose xPose = new Pose(27.5, 27, Math.toRadians(45));
+    //fixed
+    protected Pose rightBumperPose = new Pose(-44, -35, Math.toRadians(-162));
+    protected Pose leftBumperPose = new Pose(-44, 35, Math.toRadians(18));
+    protected Pose yPose = new Pose(0, 0, Math.toRadians(45));
+    protected Pose aPose = new Pose(-120, -26, Math.toRadians(-135));
+    protected Pose bPose = new Pose(-93, 0, Math.toRadians(-135));
 
     @Override
     public void runOpMode() {
@@ -75,6 +77,10 @@ public class DriverControlAtomic extends LinearOpMode {
         if (blackboard.containsKey("headingOffset")) {
             //noinspection DataFlowIssue
             headingOffset = (int) blackboard.get("headingOffset");
+        }
+        if (blackboard.containsKey("isBlueAlliance")) {
+            //noinspection DataFlowIssue
+            isBlueAlliance = (boolean) blackboard.get("isBlueAlliance");
         }
         sendTelemetry();
     }
@@ -137,25 +143,29 @@ public class DriverControlAtomic extends LinearOpMode {
         if (gamepad1.x) {
             lastAssist = AssistPose.POSE_X;
             if (follower.isTeleopDrive()) {
-                goToPose(halfShotPose);
+                goToPose(xPose);
             }
         } else if (gamepad1.y) {
             lastAssist = AssistPose.POSE_Y;
             if (follower.isTeleopDrive()) {
-                goToPose(midShotPose);
+                goToPose(yPose);
             }
-        } else if (gamepad1.back || gamepad1.right_bumper) {
-            lastAssist = AssistPose.POSE_BACK;
+        } else if (gamepad1.a) {
             if (follower.isTeleopDrive()) {
-                goToPose(farShotRightPose);
+                goToPose(aPose);
             }
         } else if (gamepad1.b) {
             if (follower.isTeleopDrive()) {
-                goToPose(parkingPose);
+                goToPose(bPose);
+            }
+        } else if (gamepad1.right_bumper) {
+            lastAssist = AssistPose.POSE_BACK;
+            if (follower.isTeleopDrive()) {
+                goToPose(isBlueAlliance ? rightBumperPose : leftBumperPose);
             }
         } else if (gamepad1.left_bumper) {
             if (follower.isTeleopDrive()) {
-                goToPose(farShotLeftPose);
+                goToPose(isBlueAlliance ? leftBumperPose : rightBumperPose);
             }
         }
         else {
@@ -185,26 +195,21 @@ public class DriverControlAtomic extends LinearOpMode {
     private void updatePose(int delta) {
         switch (lastAssist) {
             case POSE_X:
-                halfShotPose = halfShotPose.setHeading(halfShotPose.getHeading() + Math.toRadians(delta));
+                xPose = xPose.setHeading(xPose.getHeading() + Math.toRadians(delta));
                 break;
             case POSE_Y:
-                midShotPose = midShotPose.setHeading(midShotPose.getHeading() + Math.toRadians(delta));
+                yPose = yPose.setHeading(yPose.getHeading() + Math.toRadians(delta));
                 break;
             case POSE_BACK:
-                farShotLeftPose = farShotLeftPose.setHeading(farShotLeftPose.getHeading() + Math.toRadians(delta));
+                rightBumperPose = rightBumperPose.setHeading(rightBumperPose.getHeading() + Math.toRadians(delta));
                 break;
             case POSE_TRIGGER:
-                closeShotPose = closeShotPose.setHeading(closeShotPose.getHeading() + Math.toRadians(delta));
+                aPose = aPose.setHeading(aPose.getHeading() + Math.toRadians(delta));
                 break;
         }
     }
 
     private void goToPose(Pose target) {
-        boolean isBlueAlliance = true;
-        if (blackboard.containsKey("isBlueAlliance")) {
-            //noinspection DataFlowIssue
-            isBlueAlliance = (boolean) blackboard.get("isBlueAlliance");
-        }
         if (!isBlueAlliance) {
             target = RobotCommon.mirror(target);
         }

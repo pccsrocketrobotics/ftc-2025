@@ -15,7 +15,7 @@ public class BlueBaseLeft extends LinearOpMode {
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(-23,-5,Math.toRadians(90));
+    protected Pose startingPose = new Pose(-70,6,Math.toRadians(-90));
     @Override
     public void runOpMode() {
         initialize();

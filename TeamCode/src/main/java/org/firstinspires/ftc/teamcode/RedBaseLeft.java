@@ -9,7 +9,6 @@ public class RedBaseLeft extends BlueBaseLeft {
 
     @Override
     public void runOpMode() {
-        startingPose = RobotCommon.mirror(startingPose);
         super.runOpMode();
     }
     @Override

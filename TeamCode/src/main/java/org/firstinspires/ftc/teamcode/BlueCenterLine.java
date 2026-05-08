@@ -15,7 +15,7 @@ public class BlueCenterLine extends LinearOpMode {
     private Follower follower;
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
     private RobotCommon common;
-    protected Pose startingPose = new Pose(-55.5,6.3,Math.toRadians(90));
+    protected Pose startingPose = new Pose(-40,-5,Math.toRadians(-90));
     @Override
     public void runOpMode() {
         initialize();
