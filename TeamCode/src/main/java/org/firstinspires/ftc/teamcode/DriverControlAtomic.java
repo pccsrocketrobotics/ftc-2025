@@ -20,10 +20,14 @@ public class DriverControlAtomic extends LinearOpMode {
     private final DashboardTelemetry dashboardTelemetry = DashboardTelemetry.getInstance();
 
     private enum AssistPose {
+        POSE_A,
+        POSE_B,
         POSE_X,
         POSE_Y,
         POSE_BACK,
-        POSE_TRIGGER
+        POSE_TRIGGER,
+        POSE_LEFT,
+        POSE_RIGHT
     }
 
     private AssistPose lastAssist = AssistPose.POSE_BACK;
@@ -32,16 +36,16 @@ public class DriverControlAtomic extends LinearOpMode {
     public static double ROT_FAST = 0.5;
     public static double ROT_SLOW = 0.3;
     public static int LIFT_MAX = 2800;
-    public static double SHOOTER_X = 1375;
-    public static double SHOOTER_Y = 1400;
-    public static double SHOOTER_BACK = 1480;
+    public static double SHOOTER_X = 1450;
+    public static double SHOOTER_Y = 1450;
+    public static double SHOOTER_BACK = 1575;
     public static int LIFT_CHANGE = 50;
     private int headingOffset = 0;
     private boolean isBlueAlliance = true;
     protected Pose xPose = new Pose(27.5, 27, Math.toRadians(45));
     //fixed
-    protected Pose rightBumperPose = new Pose(-44, -35, Math.toRadians(-162));
-    protected Pose leftBumperPose = new Pose(-44, 35, Math.toRadians(18));
+    protected Pose rightBumperPose = new Pose(-44, -35, Math.toRadians(-162.5));
+    protected Pose leftBumperPose = new Pose(-44, 35, Math.toRadians(14.5));
     protected Pose yPose = new Pose(0, 0, Math.toRadians(45));
     protected Pose aPose = new Pose(-120, -26, Math.toRadians(-135));
     protected Pose bPose = new Pose(-93, 0, Math.toRadians(-135));
@@ -151,19 +155,22 @@ public class DriverControlAtomic extends LinearOpMode {
                 goToPose(yPose);
             }
         } else if (gamepad1.a) {
+            lastAssist = AssistPose.POSE_A;
             if (follower.isTeleopDrive()) {
                 goToPose(aPose);
             }
         } else if (gamepad1.b) {
+            lastAssist = AssistPose.POSE_B;
             if (follower.isTeleopDrive()) {
                 goToPose(bPose);
             }
         } else if (gamepad1.right_bumper) {
-            lastAssist = AssistPose.POSE_BACK;
+            lastAssist = isBlueAlliance ? AssistPose.POSE_RIGHT : AssistPose.POSE_LEFT;
             if (follower.isTeleopDrive()) {
                 goToPose(isBlueAlliance ? rightBumperPose : leftBumperPose);
             }
         } else if (gamepad1.left_bumper) {
+            lastAssist = isBlueAlliance ? AssistPose.POSE_LEFT : AssistPose.POSE_RIGHT;
             if (follower.isTeleopDrive()) {
                 goToPose(isBlueAlliance ? leftBumperPose : rightBumperPose);
             }
@@ -200,12 +207,20 @@ public class DriverControlAtomic extends LinearOpMode {
             case POSE_Y:
                 yPose = yPose.setHeading(yPose.getHeading() + Math.toRadians(delta));
                 break;
-            case POSE_BACK:
+            case POSE_RIGHT:
                 rightBumperPose = rightBumperPose.setHeading(rightBumperPose.getHeading() + Math.toRadians(delta));
                 break;
-            case POSE_TRIGGER:
+            case POSE_A:
                 aPose = aPose.setHeading(aPose.getHeading() + Math.toRadians(delta));
                 break;
+            case POSE_LEFT:
+                leftBumperPose = leftBumperPose.setHeading(leftBumperPose.getHeading() + Math.toRadians(delta));
+                break;
+            case POSE_B:
+                bPose = bPose.setHeading(bPose.getHeading() + Math.toRadians(delta));
+                break;
+
+
         }
     }
 
