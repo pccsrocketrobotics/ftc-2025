@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
+import com.seattlesolvers.solverslib.command.StartEndCommand;
 import com.seattlesolvers.solverslib.command.button.Trigger;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
@@ -33,9 +34,19 @@ public class CommandDrive extends CommandOpMode {
                         () -> gamepad1.right_trigger - gamepad1.left_trigger
                 )
         );
-        intake.setDefaultCommand(intake.inCommand());
+       // intake.setDefaultCommand(intake.inCommand());
 
-        operator.getGamepadButton(GamepadKeys.Button.Y).whenHeld(intake.outCommand());
-        operator.getGamepadButton(GamepadKeys.Button.X).whenHeld(intake.stopCommand());
+
+        operator.getGamepadButton(GamepadKeys.Button.A).whenPressed(intake.inCommand());
+        operator.getGamepadButton(GamepadKeys.Button.B).whenPressed(intake.outCommand());
+        operator.getGamepadButton(GamepadKeys.Button.Y).whenPressed(intake.stopCommand());
+        operator.getGamepadButton(GamepadKeys.Button.X).whenPressed(intake.stopCommand());
+        operator.getGamepadButton(GamepadKeys.Button.BACK).toggleWhenPressed(
+                new StartEndCommand(
+                        () -> drive.setSpeedMult(1),
+                        () -> drive.setSpeedMult(Drive.SLOW_SPEED)
+
+                )
+        );
     }
 }

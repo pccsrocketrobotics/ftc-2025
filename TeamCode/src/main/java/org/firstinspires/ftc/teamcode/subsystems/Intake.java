@@ -13,25 +13,28 @@ public class Intake extends SubsystemBase {
     public Intake(HardwareMap hardwareMap) {
         servo = hardwareMap.get(CRServo.class, "intake");
     }
+    public void spin(double speed) {
+        servo.setPower(speed);
+    }
 
     // A factory method that returns a Command.
     // put in initalize setDefaultCommand(inCommand());
     public Command inCommand() {
         return startEnd(
-                () -> servo.setPower(0.7),
-                () -> servo.setPower(0)
+            () -> spin(0.7),
+            () -> spin(0)
         );
     }
     public Command outCommand() {
         return startEnd(
-                () -> servo.setPower(-0.7),
-                () -> servo.setPower(0)
+            () -> spin(-0.7),
+            () -> spin(0)
         );
     }
     public Command stopCommand() {
         return startEnd(
-                () -> servo.setPower(0),    // runs once when the command starts
-                null
+            () -> spin(0),
+            () -> {}
         );
     }
 }
