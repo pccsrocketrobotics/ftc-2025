@@ -152,7 +152,7 @@ public class RobotCommon {
         ReflectionLogger.register(this);
     }
     public void close() {
-        KoalaLog.close();
+//        KoalaLog.close();
     }
 
     public void run() {
